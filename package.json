@@ -1,0 +1,21 @@
+{
+  "name": "ecco",
+  "version": "0.0.1",
+  "description": "Charts and visualizations for machine learning language models. Part of ecco.ml.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "visualization",
+    "machine",
+    "learning",
+    "animation"
+  ],
+  "author": "Jay Alammar",
+  "license": "ISC",
+  "dependencies": {
+    "d3": "6.2.0",
+    "xregexp": "^4.3.0"
+  }
+}
