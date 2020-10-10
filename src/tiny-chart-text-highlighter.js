@@ -1,21 +1,28 @@
 import * as d3 from "d3";
 import {token_styler, display_token} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
-import {tinyChart} from "./tiny-chart";
+import {TinyChart} from "./tiny-chart";
 
 export class TinyChartTextHighlighter extends TextHighlighter {
     constructor(_config) {
         super(_config)
+
+        this.textColor = function (value) {
+            if (this.scale(value) > 0.7)
+                return '#ffffff'
+            else
+                return '#000000'
+        }
     }
 
     textHighlighter(selection) {
-        const self = this, tinyChart1 = tinyChart()
-        console.log(2222277, selection, this, self)
+        const self = this, tinyChart1 = new TinyChart()
+        console.log(2222277, tinyChart1.scale)
         selection.each(function (d, i) {
             // console.log(33, d, this)
             // d is a list of objects, each with properties 'token' and 'value'
             // Bind token data to tokens, set token text
-            d3.select(this).selectAll('div')
+            let token_boxes = d3.select(this).selectAll('div')
                 .data(d)
                 .join('div')
                 .attr('token', (d, i) => {
@@ -29,21 +36,39 @@ export class TinyChartTextHighlighter extends TextHighlighter {
                     // console.log("9", this, self);
                     self.bgColor(d.value)
                 })
-                .style('color', (d, i) => self.textColor(d.value))
+                .style('color', (d, i) =>
+                    self.textColor(d.value))
                 .call(token_styler, d.token) // Add appropriate CSS classes (new line, partial token)
+
+
+            // # position in the sequence
+            // token_boxes
+            //     .data(d)
+            //     .append('div')
+            //     .attr('class', 'position_in_seq')
+            //     .text((d,i) => i)
+
+            // Token text
+            token_boxes.append('span')
+                .data(d=>d)
                 .text(function (d) {
-                    return display_token(d.token)
-                })
-                .call(tinyChart1)
+                return display_token(d.token)
+            })
+                .style('margin-left', '-13px') // Makes the text closer to the tiny barchart
+
+            // Tiny bar chart
+            token_boxes
+                .data(d=>d)
+                .call(tinyChart1.tinyChart.bind(tinyChart1))
 
 
-            // Show where inputs start
+            // Input sequence indicator
             d3.select(this)
                 .insert('div', ':first-child')//Insert at the beginning
                 .attr('class', 'sequence-indicator inputs-indicator')
                 .html('input:')
 
-            // Show where the output sequence starts
+            // Output sequence indicator
             d3.select(this)
                 .insert('div', '.output-token') //Insert before the first output token
                 .attr('class', 'sequence-indicator outputs-indicator')

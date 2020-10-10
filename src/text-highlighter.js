@@ -32,13 +32,13 @@ export class TextHighlighter {
     }
 
     textHighlighter(selection) {
-        const self=this
+        const self = this
         console.log(222, selection, this, self)
         selection.each(function (d, i) {
             // console.log(33, d, this)
             // d is a list of objects, each with properties 'token' and 'value'
             // Bind token data to tokens, set token text
-            d3.select(this).selectAll('div')
+            let token_boxes = d3.select(this).selectAll('div')
                 .data(d)
                 .join('div')
                 .attr('token', (d, i) => {
@@ -48,13 +48,27 @@ export class TextHighlighter {
                 // .attr('class', 'token')
                 .attr('position', (d, i) => i)
                 .attr('value', (d, i) => d.value || 0)
-                .style('background-color', (d, i) => {console.log("9",this,self) ;self.bgColor(d.value)})
+                .style('background-color', (d, i) => {
+                    self.bgColor(d.value)
+                })
                 .style('color', (d, i) => self.textColor(d.value))
                 .call(token_styler, d.token) // Add appropriate CSS classes (new line, partial token)
+
+            // # position in the sequence
+            token_boxes
+                .data(d)
+                .append('div')
+                .attr('class', 'position_in_seq')
+                .text((d,i) => i)
+
+
+            // Token text
+            token_boxes.append('span')
+                .data(d => d)
                 .text(function (d) {
                     return display_token(d.token)
                 })
-
+                .style('padding-left', '4px')
 
             // Show where inputs start
             d3.select(this)
