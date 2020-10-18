@@ -15,16 +15,22 @@ export class TinyChartTextHighlighter extends TextHighlighter {
         }
     }
 
+    init(){
+        
+    }
+
     textHighlighter(selection) {
         const self = this, tinyChart1 = new TinyChart()
-        console.log(2222277, tinyChart1.scale)
         selection.each(function (d, i) {
             // console.log(33, d, this)
             // d is a list of objects, each with properties 'token' and 'value'
             // Bind token data to tokens, set token text
             let token_boxes = d3.select(this).selectAll('div')
-                .data(d)
-                .join('div')
+                .data(d, d => d['position'])
+                .join(enter => enter.append('div')
+                        .style("background-color", "green"),
+                    update =>update.style("background-color", "red")
+                    )
                 .attr('token', (d, i) => {
                     return d.token
                 })
@@ -32,10 +38,10 @@ export class TinyChartTextHighlighter extends TextHighlighter {
                 // .attr('class', 'token')
                 .attr('position', (d, i) => i)
                 .attr('value', (d, i) => d.value || 0)
-                .style('background-color', (d, i) => {
-                    // console.log("9", this, self);
-                    self.bgColor(d.value)
-                })
+                // .style('background-color', (d, i) => {
+                //     // console.log("9", this, self);
+                //     self.bgColor(d.value)
+                // })
                 .style('color', (d, i) =>
                     self.textColor(d.value))
                 .call(token_styler, d.token) // Add appropriate CSS classes (new line, partial token)
@@ -55,11 +61,12 @@ export class TinyChartTextHighlighter extends TextHighlighter {
                 return display_token(d.token)
             })
                 .style('margin-left', '-13px') // Makes the text closer to the tiny barchart
-
+                .style("pointer-events", "none")
             // Tiny bar chart
             token_boxes
                 .data(d=>d)
                 .call(tinyChart1.tinyChart.bind(tinyChart1))
+
 
 
             // Input sequence indicator

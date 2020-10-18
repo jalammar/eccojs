@@ -29,6 +29,7 @@ export class TinyChart {
                 let value = parseFloat(d.value)
                 let svg = d3.select(this)
                     .insert('svg', ':first-child')
+                    .style("pointer-events", "none")
                     .attr("width", self.width)
                     .attr("height", self.height)
                     .style('margin-left','1px')
@@ -43,6 +44,7 @@ export class TinyChart {
                 // console.log('prob', d.prob, 'log ', Math.log10(d.prob))
                 const prob_height = normalizeHeightScale(value * self.barMaxHeight)
                 svg.append("rect")
+                    .style("pointer-events", "none")
                     .attr("y",
                         self.height - self.numericLabelHeight
                         - prob_height)
@@ -80,6 +82,7 @@ export class TinyChart {
                     .attr("text-anchor", "left")
                     .attr("alignment-baseline", "top")
                     .attr('probability', value)
+                    .style("pointer-events", "none")
             }
         )
     }

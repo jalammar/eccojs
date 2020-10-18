@@ -1,7 +1,7 @@
 import XRegExp from "XRegExp";
 
 export function token_styler(selection) {
-    console.log('styler:', selection, typeof (selection), typeof ('hi'))
+    // console.log('styler:', selection, typeof (selection), typeof ('hi'))
     selection
         .classed('token', function (d, i) {
             return true
