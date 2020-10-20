@@ -2,19 +2,23 @@ import * as d3 from "d3";
 import {TextHighlighter} from "./text-highlighter.js"
 import {TinyChartTextHighlighter} from "./tiny-chart-text-highlighter.js"
 import {InteractiveTokenSparkline} from "./interactive-token-sparkline"
+import {ActivationSparklineBase} from "./activation-sparkline"
 
-export function renderOutputSequence(viz_id, id, data) {
+export function renderOutputSequence(parent_div, data) {
 
-    const div = d3.select('#' + viz_id),
-        n_tokens = data['tokens'].length,
-        highlighter = new TextHighlighter();
+    const //div = d3.select('#' + parent_div),
+        // n_tokens = data['tokens'].length,
+        highlighter = new TextHighlighter({
+            parentDiv: parent_div,
+            data: data
+        });
     // highlighter = new TinyChartTextHighlighter();
     // highlighter.textHighlighter([1])
 
-    div.selectAll('div')
-        .data([data['tokens']])
-        .join('div')
-        .call(highlighter.textHighlighter.bind(highlighter)) // Binding, otherwise 'this' is overwritten
+    // div.selectAll('div')
+    //     .data([data['tokens']])
+    //     .join('div')
+    //     .call(highlighter.textHighlighter.bind(highlighter)) // Binding, otherwise 'this' is overwritten
 }
 
 
@@ -38,68 +42,47 @@ export function renderSeqHighlightPosition(parent_div, position, data) {
     console.log('Selection', selection, s)
 }
 
-
-export function interactiveTokens(parent_div, position, data) {
-    const token_data = data//, t = svg.transition().duration(750);
-
+// Small bar next to each token. Change their value upon hovering on output
+// tokens (to visualize attribution
+export function interactiveTokens(parent_div, data) {
     const tokenChart = new InteractiveTokenSparkline({
         parentDiv: parent_div,
         data: data,
     })
-    console.log(11)
-    // tokenChart.draw()
-    console.log(55)
+}
 
-    // function viz(data) {
-    //     const div = d3.select('#' + parent_div),
-    //         n_tokens = data.length,
-    //         highlighter = new TinyChartTextHighlighter();
-    //
-    //     function updateData(old, newData) {
-    //         console.log('update', old, newData)
-    //         for (let i = 0; i < old.length; i++) {
-    //             old[i].value = newData[i]
-    //         }
-    //         return old
-    //     }
-    //
-    //     function assignOnmouseover(sel) {
-    //         console.log('sss', sel)
-    //         sel.each(function (d, i) {
-    //             console.log('each', d, this)
-    //             d3.select(this)
-    //                 .selectAll('div.output-token')
-    //                 .on("mouseenter", function (d, i) {
-    //                     console.log(d, i, this)
-    //                     d3.event.stopPropagation();
-    //                     let newData = updateData(data, token_data['attributions'][i])
-    //                     viz(newData)
-    //                 })
-    //         })
-    //     }
-    //
-    //     const innerDiv = div.append('div')
-    //     // let selection = div
-    //     //     .selectAll('div')
-    //     //     .data([data])
-    //     //     .join(enter => enter.append('div').style("background-color", "green"),
-    //     //         update => update.style("background-color", "red"))
-    //
-    //
-    //     let token_boxes = innerDiv
-    //         .selectAll('div')
-    //         .data(data)
-    //         .join(enter => enter.append('div').style("background-color", "green"),
-    //             update => update.style("background-color", "red"))
-    //
-    //
-    //     selection.call(highlighter.textHighlighter.bind(highlighter)) // Binding, otherwise 'this' is overwritten
-    //
-    //     selection.call(assignOnmouseover)
-    //
-    //     // Highlight the selected token
-    //     let s = d3.selectAll(`[position="${position}"]`)
-    //         .style('border', '1px solid #8E24AA')
+// Shows tokens with highlighted bg colors based on value
+export function bgHighlighterSequence(parent_div, data) {
+    const highlighter = new TextHighlighter({
+        parentDiv: parent_div,
+        data: data,
+        showPosition: false,
+        overrideTokenBorderColor: 'white'
+    });
+}
 
-    // console.log('Selection', selection, s)
+
+export function interactiveTokensAndFactorSparklines(parent_div, data) {
+
+    // Draw the sparkline line-charts for factor activations
+    const activationSparkline = new ActivationSparklineBase({
+        parentDiv: parent_div,
+        data: data
+    })
+
+    // Draw the tokens showing the activations
+    const highlighter = new TextHighlighter({
+        parentDiv: parent_div,
+        data: data,
+        showPosition: false,
+        overrideTokenBorderColor: 'white',
+        valuesKey:'factors'
+    });
+
+    activationSparkline.hoverAction= function(id, color){
+        console.log('hoverAction', id)
+        // When hovering on a line chart, show its values on the tokens
+        highlighter.updateData(id, color)
+        highlighter.redraw()
+    }
 }

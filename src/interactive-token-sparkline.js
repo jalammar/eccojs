@@ -1,32 +1,23 @@
 import * as d3 from "d3";
 import {token_styler, display_token} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
-import {TokenSparkline} from "./token-sparkline.js";
+import {TokenSparkline, TokenSparklineBase} from "./token-sparkline.js";
 
 export class InteractiveTokenSparkline extends TextHighlighter {
     constructor(_config) {
         super(_config)
-        this.parentDivId = _config.parentDiv
-        this.data = _config.data
 
-        this.textColor = function (value) {
-            if (this.scale(value) > 0.7)
-                return '#ffffff'
-            else
-                return '#000000'
-        }
         this.init()
     }
 
     init() {
-        this.tokenSparkline = new TokenSparkline()
+        this.tokenSparkline = new TokenSparklineBase() //TokenSparkline()
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
 
-        const self = this
-
-        const token_boxes = this.setupTokenBoxes()
-
+        const self = this,
+            // Construct token boxes, most of the work is done here
+            token_boxes = this.setupTokenBoxes()
 
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
@@ -59,6 +50,9 @@ export class InteractiveTokenSparkline extends TextHighlighter {
 
     setupTokenBoxes() {
         const self = this
+        const bgScaler = d3.scaleLinear()
+            .domain([0, 1]) //TODO: Change the domain when the values are set
+            .range([1, 0])
         const token_boxes = this.innerDiv.selectAll('div.token')
             .data(self.data['tokens'], (d, i) => {
                 return d['position']
@@ -74,9 +68,12 @@ export class InteractiveTokenSparkline extends TextHighlighter {
                         .attr('value', (d, i) => d.value || 0)
                         .style('color', (d, i) =>
                             self.textColor(d.value))
+                        .style('background-color', (d) => {
+                            return self.bgColor(d.value)
+                            }
+                        )
                         .call(token_styler)
                         .each(function (d) {
-
                             d3.select(this).append('span')
                                 .text(function (d) {
                                     return display_token(d.token)
@@ -99,21 +96,24 @@ export class InteractiveTokenSparkline extends TextHighlighter {
     updateData(attribution_list_id) {
         const newValues = this.data['attributions'][attribution_list_id]
         let max = this.data['tokens'][0].value
+        // Update the 'value' parameter of each token
+        // So when self.setupTokenBoxes() is called, it updates
+        // whatever depends on 'value' (namely, bar sparkline, and its numeric value)
         for (let i = 0; i < this.data['tokens'].length; i++) {
             this.data['tokens'][i].value = newValues[i] ? newValues[i] : 0
             if (this.data['tokens'][i].value > max)
                 max = this.data['tokens'][i].value
         }
-        console.log('max', max)
+
         // Set the max value as the new top of the domain for the sparkline
         // -- Both for color and for bar height
         this.tokenSparkline.config.colorScaler = d3.scaleLinear()
-            .domain([0,max ])
+            .domain([0, max])
             .range(this.tokenSparkline.config.colorScaler.range())
-        console.log('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
+        // console.log('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
 
         this.tokenSparkline.config.normalizeHeightScale = d3.scaleLinear()
-            .domain([0,max ])
+            .domain([0, max])
             .range(this.tokenSparkline.config.normalizeHeightScale.range())
     }
 }

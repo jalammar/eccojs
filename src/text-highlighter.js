@@ -3,109 +3,172 @@ import {token_styler, display_token} from "./util.js"
 
 export class TextHighlighter {
 
-    constructor(_config) {
-        console.log(11, this)
-        this.x = 1
-        this.scale = d3.scaleLinear()
-            .domain([-1, 1])
-            .range([0, 1])
-        this.bgColorScheme = d3.interpolatePiYG
-        this.bgColor = function (value) {
-            if (value !== undefined)
-                return this.bgColorScheme(this.scale(value))
-            else
-                return "white"
-        }
-        this.textColor = function (value) {
-            if ((this.scale(value) < 0.3) ||
-                (this.scale(value) > 0.7))
-                return '#ffffff'
-            else
-                return '#000000'
+    constructor(_config = {}) {
+
+        this.config = {
+
+            // Controls for color of background
+            bgColorScaler: _config.bgColorScaler ||
+                d3.scaleLinear().domain([0.2, 1]).range([0, 0.5]),
+            bgColorInterpolator: _config.bgColorInterpolator ||
+                d3.interpolateBlues,
+
+            // Controls for color of token text
+            textColorScaler: _config.textColorScaler ||
+                d3.scaleLinear()
+                    .domain([0,1])
+                    .range([0, 1]),
+            textColorInterpolator: _config.textColorInterpolator,
+
+
+
+            // display the number of the position in sequence. Default true
+            showPosition:(typeof _config.showPosition !== "undefined")?
+                _config.showPosition : true, // Value could be 'false', this is to accommodate
+
+            overrideTokenBorderColor: _config.overrideTokenBorderColor, // Okay to be undefined
+
+            // The data object will a 'tokens' list and another member e.g. 'attributions'
+            // or 'factors'. We declare its name here so we can retrieve the values.
+            valuesKey: _config.valuesKey || 'values'
         }
 
-        // this.config = {
-        //     parentElement: _config.parentElement,
-        //     height: _config.height || 300,
-        //     margin: { top: 10, bottom: 30, right: 10, left: 30 }
-        // }
+        this.parentDivId = _config.parentDiv
+        this.data = _config.data
+
+
+        this.init()
     }
 
-    textHighlighter(selection) {
+
+    init() {
         const self = this
-        console.log(222, selection, this, self)
-        selection.each(function (d, i) {
-            // console.log(33, d, this)
-            // d is a list of objects, each with properties 'token' and 'value'
-            // Bind token data to tokens, set token text
-            let token_boxes = d3.select(this).selectAll('div')
-                .data(d)
-                .join('div')
-                .attr('token', (d, i) => {
-                    return d.token
-                })
-                .attr('id', (d, i) => 't' + i)
-                // .attr('class', 'token')
-                .attr('position', (d, i) => i)
-                .attr('value', (d, i) => d.value || 0)
-                .style('background-color', (d, i) => {
-                    self.bgColor(d.value)
-                })
-                .style('color', (d, i) => self.textColor(d.value))
-                .call(token_styler, d.token) // Add appropriate CSS classes (new line, partial token)
-
-            // # position in the sequence
-            token_boxes
-                .data(d)
-                .append('div')
-                .attr('class', 'position_in_seq')
-                .text((d,i) => i)
+        this.div = d3.select('#' + this.parentDivId)
+        this.innerDiv = this.div.append('div')
 
 
-            // Token text
-            token_boxes.append('span')
-                .data(d => d)
-                .text(function (d) {
-                    return display_token(d.token)
-                })
-                .style('padding-left', '4px')
+        this.innerDiv.style('float', 'left')
+            .style('float', 'left')
+            .style('width', '70%')
+        // Construct token boxes, most of the work is done here
+        const token_boxes = this.setupTokenBoxes()
 
-            // Show where inputs start
-            d3.select(this)
-                .insert('div', ':first-child')//Insert at the beginning
-                .attr('class', 'sequence-indicator inputs-indicator')
-                .html('input:')
 
-            // Show where the output sequence starts
-            d3.select(this)
-                .insert('div', '.output-token') //Insert before the first output token
-                .attr('class', 'sequence-indicator outputs-indicator')
-                .html('output:')
-        })
+        // Show where inputs start
+        this.innerDiv
+            .insert('div', ':first-child')//Insert at the beginning
+            .attr('class', 'sequence-indicator inputs-indicator')
+            .html('input:')
+
+        // Show where the output sequence starts
+        this.innerDiv
+            .insert('div', '.output-token') //Insert before the first output token
+            .attr('class', 'sequence-indicator outputs-indicator')
+            .html('output:')
+
     }
 
 
-    scale(value) {
-        if (!arguments.length) return this.scale;
-        this.scale = value;
-        return this;
-    };
+    setupTokenBoxes() {
+        const self = this
+        let token_boxes = this.innerDiv.selectAll('div.token')
+            .data(self.data['tokens'], (d, i) => {
+                return d['position'] //The position of the token is its key
+            })
+            .join(enter =>
+                    enter.append('div')
+                        .attr('token', (d, i) => {
+                            return d.token
+                        })
+                        .attr('id', (d, i) => 't' + i)
+                        .attr('position', (d, i) => i)
+                        .attr('value', (d, i) => d.value || 0)
+                        .style('background-color', (d, i) => {
+                            // console.log("bg", d, d.value)
+                            return self.bgColor(d.value)
+                        })
+                        .style('border-color', () => {
+                            if (self.config.overrideTokenBorderColor)
+                                return self.config.overrideTokenBorderColor
+                            // If not set, don't return anything, let it fallback to CSS definition
+                        })
+                        .call(token_styler)
+                        // Set up the children of the box
+                        .each(function (d, i) {
 
-    bgColorScheme(value) {
-        if (!arguments.length) return this.bgColorScheme;
-        this.bgColorScheme = value;
-        return this;
-    };
+                            // Position in the sequence
+                            if( self.config.showPosition ){
+                                d3.select(this).append('div')
+                                    .attr('class', 'position_in_seq')
+                                    .text(() => i)
+                            }
+
+                            // Token Text
+                            d3.select(this).append('span')
+                                .text(() => display_token(d.token))
+                                .style('color', (d, i) => self.textColor(d.value))
+                                .style('padding-left', '4px')
+
+                        }),
+                update => update
+                    .style('background-color', (d) => {
+                            return self.bgColor(d.value)
+                        })
+                    // .each(function (d) {
+                    // })
+            )// End Join
+    }
 
     bgColor(value) {
-        if (!arguments.length) return this.bgColor;
-        this.bgColor = value;
-        return this;
+        if (value !== undefined)
+            return this.config.bgColorInterpolator(
+                this.config.bgColorScaler(value))
+        else
+            return "white"
     };
 
     textColor(value) {
-        if (!arguments.length) return this.textColor;
-        this.textColor = value;
-        return this;
+        const scaledValue = this.config.textColorScaler(value)
+        if (this.config.textColorInterpolator) {
+            return this.config.textColorInterpolator(scaledValue)
+        }
+        // else if (scaledValue > 0.4)
+        //     return '#ffffff'
+        else
+            return '#000000'
     };
+
+
+    updateData(id, color = null) {
+        const newValues = this.data[this.config.valuesKey][0][id]
+        console.log('updateData', newValues,
+            this.config.valuesKey,
+            this.data[this.config.valuesKey][0],
+            id
+            )
+        let max = this.data['tokens'][0].value
+        // Update the 'value' parameter of each token
+        // So when self.setupTokenBoxes() is called, it updates
+        // whatever depends on 'value' (namely, bar sparkline, and its numeric value)
+        for (let i = 0; i < this.data['tokens'].length; i++) {
+            this.data['tokens'][i].value = newValues[i] ? newValues[i] : 0
+            if (this.data['tokens'][i].value > max)
+                max = this.data['tokens'][i].value
+        }
+
+        // Update the color scale used to highlight the tokens
+        if(color){
+            console.log('color', color)
+            this.config.bgColorInterpolator = d3.interpolateRgb("white", color)
+            this.config.bgColorScaler =
+                d3.scaleLinear()
+                    .domain([0,d3.max(newValues)])
+                    .range([0, 1])
+        }
+    }
+
+    redraw(){
+        this.setupTokenBoxes()
+    }
+
 }

@@ -8,7 +8,7 @@ export function token_styler(selection) {
         })
         .classed('new-line', function (d, i) {
             // console.log('nl', d, d == '\n')
-            return d.token === '\n'; // True if new line
+            return d.token === '\n' || d.token === '\n\n' ; // True if new line
         })
         .classed('token-part', function (d, i) {
             // If the first character is a space, then this is a partial token
@@ -39,6 +39,11 @@ export function display_token(token) {
     if (token === '\n') { // Was: '\n'
         // console.log('new line')
         return '\\n'
+    }
+
+    if (token === '\n\n') { // Was: '\n'
+        // console.log('new line')
+        return '\\n\\n'
     }
     return token
 }

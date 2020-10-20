@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-class TokenSparklineBase {
+export class TokenSparklineBase {
     constructor(_config = {}) {
         this.config = {
             width: _config.width || 30,
@@ -19,7 +19,19 @@ class TokenSparklineBase {
             this.config.height - this.config.numericLabelHeight
     }
 
-    draw() {
+    draw(selection) {
+        const self=this
+        selection.each(function (d, i) {
+            let value = parseFloat(d.value)
+            let svg = d3.select(this)
+                .insert('svg', ':first-child')
+                // .style("pointer-events", "none")
+                .attr("width", self.config.width)
+                .attr("height", self.config.height)
+                .style('margin-left', '1px')
+                .style('float', 'left')
+                .append('g')
+        })
     }
 
     update() {
