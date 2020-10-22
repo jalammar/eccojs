@@ -1,0 +1,99 @@
+<html lang="en">
+<script src="https://requirejs.org/docs/release/2.3.6/minified/require.js"></script>
+<script>
+    // var ecco_url = 'https://storage.googleapis.com/ml-intro/ecco/'
+    var ecco_url = 'http://localhost:8000/ecco/'
+
+    if (window.ecco === undefined) window.ecco = {}
+
+    requirejs.config({
+        urlArgs: "bust=" + (new Date()).getTime(),
+        nodeRequire: require,
+        paths: {
+            d3: "https://d3js.org/d3.v5.min",
+            jquery: "https://code.jquery.com/jquery-3.5.1.min",
+            oldEcco: ecco_url + 'ecco',
+            ecco: ecco_url + 'ecco-bundle',
+            rxjs: 'https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.6.3/rxjs.umd.min',
+            XRegExp: 'https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min'
+        }
+    });
+    requirejs(['d3'],
+        function (d3) {
+            d3.select('#css').attr('href', ecco_url + 'html/styles.css')
+        })
+    define('basic', ['d3'],
+        function (d3) {
+            return {
+                init: function () {
+
+                    console.log('basic init')
+                    const viz_id = "viz_" + Math.round(Math.random() * 10000000)
+                    const div = d3.select('#basic').attr('id', viz_id),
+                        div_parent = d3.select('#' + viz_id).node().parentNode
+
+                    // Link to CSS file
+                    d3.select(div_parent).insert('link')
+                        .attr('rel', 'stylesheet')
+                        .attr('type', 'text/css')
+                        .attr('href', ecco_url + 'html/styles.css')
+
+                    return viz_id
+                }
+            }
+
+        }, function (err) {
+            console.log(err);
+        }
+    )
+
+
+    requirejs(['basic', 'd3', 'ecco', 'rxjs'],
+        function (basic, d3, ecco, rxjs) {
+            const vizId = basic.init(),
+                data = {
+                    tokens: [
+                        {token: 'To', position: 0, type: 'input'},
+                        {token: ' make', position: 1, type: 'input'},
+                        {token: ' an', position: 2, type: 'input'},
+                        {token: ' apple', position: 3, type: 'output'},
+                    ]
+                }
+            let sequence = ecco.renderOutputSequence(vizId, data),
+
+                upcomingTokens = ['pie', ' , ', ' you',
+                    ' must', ' first', ' create',
+                    ' the', ' universe']
+
+    for (let i = 0; i < upcomingTokens.length; i++) {
+        setTimeout(() => {
+            console.log(upcomingTokens, 'adding', upcomingTokens[i])
+            sequence.addToken(
+                {
+                    token: upcomingTokens[i],
+                    position: data['tokens'].length ,
+                    type: 'output'
+                }
+            )
+            sequence.redraw()
+        }, 1000 * (i+1))
+    }
+    })
+
+</script>
+
+<head>
+    <link id='css' rel="stylesheet" type="text/css">
+
+</head>
+
+<div id="basic"></div>
+
+ad => <div style="display:inline-block;
+background-color: lightskyblue;
+border: 2px solid #333;
+border-radius:2px;
+font-family: 'Roboto Mono', monospace;
+">️ Transformer LM &nbsp; </div> => fda
+<img src="flame.svg" style="width:1em; fill:red; margin-top:3px;transform: rotate(-90deg);" />
+‍

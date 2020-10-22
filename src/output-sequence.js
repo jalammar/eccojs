@@ -6,19 +6,12 @@ import {ActivationSparklineBase} from "./activation-sparkline"
 
 export function renderOutputSequence(parent_div, data) {
 
-    const //div = d3.select('#' + parent_div),
-        // n_tokens = data['tokens'].length,
-        highlighter = new TextHighlighter({
+    const highlighter = new TextHighlighter({
             parentDiv: parent_div,
             data: data
         });
-    // highlighter = new TinyChartTextHighlighter();
-    // highlighter.textHighlighter([1])
 
-    // div.selectAll('div')
-    //     .data([data['tokens']])
-    //     .join('div')
-    //     .call(highlighter.textHighlighter.bind(highlighter)) // Binding, otherwise 'this' is overwritten
+    return highlighter;
 }
 
 

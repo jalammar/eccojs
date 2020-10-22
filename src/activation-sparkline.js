@@ -13,8 +13,8 @@ export class ActivationSparklineBase {
 
         this.config['height'] = _config.height ||
             400 +
-            d3.min([600, 15 * _config.data['factors'][0].length]) // Scale according to the number of factors,
-            // but only up to 600
+            d3.min([500, 15 * _config.data['factors'][0].length]) // Scale according to the number of factors,
+            // but only up to 400
             - this.config.margin.top
             - this.config.margin.bottom;
 

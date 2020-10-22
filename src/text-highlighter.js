@@ -4,9 +4,7 @@ import {token_styler, display_token} from "./util.js"
 export class TextHighlighter {
 
     constructor(_config = {}) {
-
         this.config = {
-
             // Controls for color of background
             bgColorScaler: _config.bgColorScaler ||
                 d3.scaleLinear().domain([0.2, 1]).range([0, 0.5]),
@@ -83,6 +81,7 @@ export class TextHighlighter {
                         .attr('id', (d, i) => 't' + i)
                         .attr('position', (d, i) => i)
                         .attr('value', (d, i) => d.value || 0)
+                        .style('opacity', 0)
                         .style('background-color', (d, i) => {
                             // console.log("bg", d, d.value)
                             return self.bgColor(d.value)
@@ -102,14 +101,17 @@ export class TextHighlighter {
                                     .attr('class', 'position_in_seq')
                                     .text(() => i)
                             }
-
                             // Token Text
                             d3.select(this).append('span')
                                 .text(() => display_token(d.token))
                                 .style('color', (d, i) => self.textColor(d.value))
                                 .style('padding-left', '4px')
 
-                        }),
+                        })
+                        .call(enter => enter.transition().duration(500)
+                            .style('opacity', 1))
+
+                        ,
                 update => update
                     .style('background-color', (d) => {
                             return self.bgColor(d.value)
@@ -165,6 +167,11 @@ export class TextHighlighter {
                     .domain([0,d3.max(newValues)])
                     .range([0, 1])
         }
+    }
+
+    addToken(token){
+        this.data['tokens'].push(token)
+        console.log(this.data['tokens'])
     }
 
     redraw(){
