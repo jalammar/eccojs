@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-export class TokenSparklineBase {
+export class TokenSparkbarBase {
     constructor(_config = {}) {
         this.config = {
             width: _config.width || 30,
@@ -38,7 +38,7 @@ export class TokenSparklineBase {
     }
 }
 
-export class TokenSparkline extends TokenSparklineBase {
+export class TokenSparkbar extends TokenSparkbarBase {
     constructor(_config={}) {
         super(_config)
         this.config.normalizeHeightScale =
@@ -53,6 +53,7 @@ export class TokenSparkline extends TokenSparklineBase {
         // each will overwrite 'this'
 
         selection.each(function (d, i) {
+            console.log('sparkbar', d)
                 let value = parseFloat(d.value)
                 let svg = d3.select(this)
                     .insert('svg', ':first-child')
@@ -112,7 +113,7 @@ export class TokenSparkline extends TokenSparklineBase {
 
     update(selection) {
         const self = this
-        console.log('DOMAIN', this.config.normalizeHeightScale.domain())
+
         selection.each(function (d, i) {
             let value = parseFloat(d.value)
             const prob_height = self.config.normalizeHeightScale(

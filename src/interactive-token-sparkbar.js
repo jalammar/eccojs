@@ -1,38 +1,32 @@
 import * as d3 from "d3";
 import {token_styler, display_token} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
-import {TokenSparkline, TokenSparklineBase} from "./token-sparkline.js";
+import {TokenSparkbar} from "./token-sparkbar.js";
 
-export class InteractiveTokenSparkline extends TextHighlighter {
+export class InteractiveTokenSparkbar extends TextHighlighter {
     constructor(_config) {
         super(_config)
 
-        this.init()
     }
 
     init() {
-        this.tokenSparkline = new TokenSparklineBase() //TokenSparkline()
+        console.log('data 0', this.data)
+        this.tokenSparkline = new TokenSparkbar()
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
 
         const self = this,
             // Construct token boxes, most of the work is done here
-            token_boxes = this.setupTokenBoxes()
+            token_boxes = this.setupTokenBoxes(self.data['tokens'])
 
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
-            .on("mouseenter", function (d, i) {
-
-                let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
-                    .style('border', '')
-                    .attr('highlighted', false)
-                    .style('background-color', '')
-                let s = self.innerDiv.selectAll(`[position="${d.position}"]`)
-                    .attr('highlighted', true)
-                    .style('border', '1px solid #8E24AA')
-                    .style('background-color', '#E1BEE7')
-                self.updateData(i)
-                self.setupTokenBoxes()
+            .style('border','1px dashed purple')
+            .on("mouseenter", (d, i)=>{
+                self.hover(d,i)
+            })
+            .on("touchstart", (d,i)=>{
+                self.hover(d,i)
             })
 
         // Input sequence indicator
@@ -48,13 +42,35 @@ export class InteractiveTokenSparkline extends TextHighlighter {
             .html('output:')
     }
 
-    setupTokenBoxes() {
+    hover(d,i){
+        const self = this
+        console.log('hover', i)
+        let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
+            .style('border', '1px dashed purple')
+            .attr('highlighted', false)
+            .style('background-color', '')
+        let s = self.innerDiv.selectAll(`[position="${d.position}"]`)
+            .attr('highlighted', true)
+            .style('border', '1px solid #8E24AA')
+            .style('background-color', '#E1BEE7')
+        self.updateData(i)
+        self.setupTokenBoxes(self.data['tokens'])
+    }
+
+    selectFirstToken() {
+        const firstTokenId = this.innerDiv.select('.output-token').attr('position')
+        console.log('firstTokenId', firstTokenId)
+        this.hover({position: firstTokenId}, 4)
+    }
+
+    setupTokenBoxes(tokenData) {
+        //
         const self = this
         const bgScaler = d3.scaleLinear()
             .domain([0, 1]) //TODO: Change the domain when the values are set
             .range([1, 0])
         const token_boxes = this.innerDiv.selectAll('div.token')
-            .data(self.data['tokens'], (d, i) => {
+            .data(tokenData, (d, i) => {
                 return d['position']
             })
             .join(
@@ -69,7 +85,7 @@ export class InteractiveTokenSparkline extends TextHighlighter {
                         .style('color', (d, i) =>
                             self.textColor(d.value))
                         .style('background-color', (d) => {
-                            return self.bgColor(d.value)
+                            // return self.bgColor(d)
                             }
                         )
                         .call(token_styler)
@@ -94,7 +110,10 @@ export class InteractiveTokenSparkline extends TextHighlighter {
     }
 
     updateData(attribution_list_id) {
+        console.log('data', this.data)
+        console.log('updateData', attribution_list_id)
         const newValues = this.data['attributions'][attribution_list_id]
+        console.log('newValues', newValues, this.data['attributions'])
         let max = this.data['tokens'][0].value
         // Update the 'value' parameter of each token
         // So when self.setupTokenBoxes() is called, it updates

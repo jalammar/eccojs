@@ -9,7 +9,7 @@ export class TextHighlighter {
             bgColorScaler: _config.bgColorScaler ||
                 d3.scaleLinear().domain([0.2, 1]).range([0, 0.5]),
             bgColorInterpolator: _config.bgColorInterpolator ||
-                d3.interpolateBlues,
+                d3.interpolateRgb("white", "blue"),
 
             // Controls for color of token text
             textColorScaler: _config.textColorScaler ||
@@ -28,14 +28,15 @@ export class TextHighlighter {
 
             // The data object will a 'tokens' list and another member e.g. 'attributions'
             // or 'factors'. We declare its name here so we can retrieve the values.
-            valuesKey: _config.valuesKey || 'values'
+            valuesKey: _config.valuesKey || 'values',
+
+            // Flag used to control highlight animation in bgColor()
+            overrideColorParam: false
         }
 
         this.parentDivId = _config.parentDiv
         this.data = _config.data
 
-
-        this.init()
     }
 
 
@@ -49,7 +50,7 @@ export class TextHighlighter {
             .style('float', 'left')
             .style('width', '70%')
         // Construct token boxes, most of the work is done here
-        const token_boxes = this.setupTokenBoxes()
+        const token_boxes = this.setupTokenBoxes(this.data['tokens'])
 
 
         // Show where inputs start
@@ -67,10 +68,10 @@ export class TextHighlighter {
     }
 
 
-    setupTokenBoxes() {
+    setupTokenBoxes(tokenData) {
         const self = this
         let token_boxes = this.innerDiv.selectAll('div.token')
-            .data(self.data['tokens'], (d, i) => {
+            .data(tokenData, (d, i) => {
                 return d['position'] //The position of the token is its key
             })
             .join(enter =>
@@ -84,7 +85,7 @@ export class TextHighlighter {
                         .style('opacity', 0)
                         .style('background-color', (d, i) => {
                             // console.log("bg", d, d.value)
-                            return self.bgColor(d.value)
+                            return self.bgColor(d)
                         })
                         .style('border-color', () => {
                             if (self.config.overrideTokenBorderColor)
@@ -114,17 +115,26 @@ export class TextHighlighter {
                         ,
                 update => update
                     .style('background-color', (d) => {
-                            return self.bgColor(d.value)
+                            return self.bgColor(d)
                         })
                     // .each(function (d) {
                     // })
             )// End Join
     }
 
-    bgColor(value) {
-        if (value !== undefined)
+    // Get the background
+    bgColor(token) {
+        // If token explicitly has a color, use that
+        // Case: using different colors for different factors in one view
+        // console.log('bgColor',(!this.config.overrideColorParam) ,  (token.color !== undefined))
+        if ((!this.config.overrideColorParam) && (token.color !== undefined)){
+            return token.color
+        }
+        // If no explicit color, interpolate using value
+        else if (token.value !== undefined)
             return this.config.bgColorInterpolator(
-                this.config.bgColorScaler(value))
+                this.config.bgColorScaler(token.value))
+        // If no Value, white background
         else
             return "white"
     };
@@ -143,19 +153,15 @@ export class TextHighlighter {
 
     updateData(id, color = null) {
         const newValues = this.data[this.config.valuesKey][0][id]
-        console.log('updateData', newValues,
-            this.config.valuesKey,
-            this.data[this.config.valuesKey][0],
-            id
-            )
-        let max = this.data['tokens'][0].value
+
+        // let max = this.data['tokens'][0].value
         // Update the 'value' parameter of each token
         // So when self.setupTokenBoxes() is called, it updates
         // whatever depends on 'value' (namely, bar sparkline, and its numeric value)
         for (let i = 0; i < this.data['tokens'].length; i++) {
             this.data['tokens'][i].value = newValues[i] ? newValues[i] : 0
-            if (this.data['tokens'][i].value > max)
-                max = this.data['tokens'][i].value
+            // if (this.data['tokens'][i].value > max)
+            //     max = this.data['tokens'][i].value
         }
 
         // Update the color scale used to highlight the tokens
@@ -175,7 +181,7 @@ export class TextHighlighter {
     }
 
     redraw(){
-        this.setupTokenBoxes()
+        this.setupTokenBoxes(this.data['tokens'])
     }
 
 }

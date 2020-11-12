@@ -3,17 +3,22 @@ import * as d3 from "d3";
 // Reference: https://observablehq.com/d/9d7507ca9c029767
 export class ActivationSparklineBase {
     constructor(_config = {}) {
-
+         // console.log(_config)
         // this.config.margin =  _config.margin ||
         //     {top: 50, right: 30, bottom: 30, left: 60}, // Default value
         this.config = {
             margin: _config.margin ||
-                {top: 50, right: 30, bottom: 30, left: 60},
+                {top: 50, right: 30, bottom: 30, left: 30},
+
+            // The higher the value, the more the lines would overlap
+            // Lower values are problematic if we show only 3-5 lines
+            overlap: _config.overlap || 0.3,
+
         }
 
         this.config['height'] = _config.height ||
-            400 +
-            d3.min([500, 15 * _config.data['factors'][0].length]) // Scale according to the number of factors,
+            200 +
+            d3.min([500, 20 * _config.data['factors'][0].length]) // Scale according to the number of factors,
             // but only up to 400
             - this.config.margin.top
             - this.config.margin.bottom;
@@ -25,14 +30,13 @@ export class ActivationSparklineBase {
 
         this.parentDivId = _config.parentDiv
         this.data = _config.data
-        this.init()
     }
 
     init() {
         const self = this,
             factors = this.data['factors'][0],
-            n_factors = factors.length,
-            overlap = 1.5 // The higher the value, the more the lines would overlap
+            n_factors = factors.length
+
 
         // var margin = {top: 50, right: 30, bottom: 30, left: 60},
         //     width = 350 - margin.left - margin.right,
@@ -47,11 +51,11 @@ export class ActivationSparklineBase {
             .attr("viewBox", [0, 0, this.config.width, this.config.height]);
 
 
-        var lineColors = d3.scaleSequential()
+        this.lineColors = d3.scaleSequential()
             .domain([0, factors.length])
             // .range([0.1,1])
             .interpolator(d3.interpolateRainbow);
-        console.log('interpolate', lineColors(0))
+        // console.log('interpolate', this.lineColors(0))
 
         var x = d3.scaleLinear()
             .domain([0, factors[0].length])
@@ -61,30 +65,22 @@ export class ActivationSparklineBase {
         // Scale to place each line chart vertically in the right place
         var y_lines = d3.scalePoint()
             .domain(factors.map((d, i) => i)) // List of chart ids e.g. [0,1,2]
+
             .range([this.config.margin.top,
                 this.config.height - this.config.margin.bottom])
 
-        // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([0, 1])
-            .range([this.config.height, 0]);
-
+        // The y axis interploator for the line/area path
         const z = d3.scaleLinear()
             .domain([
                 d3.min(factors, d => d3.min(d)),
                 d3.max(factors, d => d3.max(d)) / 2
             ])
-            .range([0, -overlap * y_lines.step()])
+            .range([0,  -self.config.overlap *y_lines.step()])//
 
-        console.log(y.domain())
         let line = d3.line()
             .curve(d3.curveCardinal)
-            .x(function (d, i) {
-                return x(i)
-            })
-            .y(function (d) {
-                return z(d)
-            })
+            .x((d, i)=> x(i) )
+            .y((d)=> z(d))
 
         const groups = this.svg.selectAll('g')
             .data(factors)
@@ -94,28 +90,51 @@ export class ActivationSparklineBase {
                     return `translate(0, ${y_lines(i)})`
                 }
             ) // Move to the appropriate height
+
+
+        // Area under the line
         const area = d3.area()
             .defined(d => !isNaN(d))
             .x((d, i) => x(i))
             .y0(0)
             .y1(z)
+        // groups.append("path")
+        //     .attr("fill", (d, i) => this.lineColors(i))
+        //     .attr("opacity", 0.2)
+        //     .attr("d", area);
+        groups.append('text')
+            // .attr('y', -y_lines.step()/2)
+            // .attr('x' ,-5)
+            .attr('fill', (d, i) => this.lineColors(i) )
+            .attr('font-size', '20px')
+            .text((d,i)=>i+1)
 
-        console.log(')))))', lineColors(0))
-        groups.append("path")
-            .attr("fill", (d, i) => lineColors(i))
-            .attr("opacity", 0.2)
-            .attr("d", area);
-
-
-        // Draw the line
+        // Draw the visibile line
         groups.append('path')
             .attr("fill", "none")
-            .attr("stroke", (d, i) => lineColors(i))
+            .attr("stroke-width", 2)
+            .attr("stroke", (d, i) => this.lineColors(i))
             .attr("d", line)
-            .on("mouseenter", function (d, i) {
-                console.log('hovering over', i)
-                self.hover(i, lineColors(i))
+
+        // Draw another line, same path, but fatter so interaction is easier
+        groups.append('path')
+            .attr("fill", "none")
+            .attr("opacity", 0)
+            .attr("stroke-width", 30)
+            .attr("stroke", (d, i) => this.lineColors(i))
+            .attr("d", line)
+            .on("mouseenter",  (d, i)=> {
+                self.hover(i, self.lineColors(i))
             })
+            .on("touchstart",  (d, i)=> {
+                self.hover(i, self.lineColors(i))
+            })
+            .on('mouseleave', (d,i)=>{
+                self.hoverEnd(i, self.lineColors(i))
+            })
+            // .on('touchend', (d,i)=>{
+            //     self.hoverEnd(i, self.lineColors(i))
+            // })
 
         // Bottom axis, I think
         this.svg.append("g")
@@ -126,5 +145,10 @@ export class ActivationSparklineBase {
 
     hover(id, color) {
         this.hoverAction(id, color)
+    }
+
+
+    hoverEnd(id, color) {
+        this.hoverEndAction(id, color)
     }
 }

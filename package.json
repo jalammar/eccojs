@@ -14,8 +14,13 @@
   ],
   "author": "Jay Alammar",
   "license": "ISC",
+  "devDependencies": {
+    "rollup": "2",
+    "tape": "4"
+  },
   "dependencies": {
     "d3": "6.2.0",
-    "xregexp": "^4.3.0"
+    "xregexp": "^4.3.0",
+    "d3-array": "^2.8.0"
   }
 }
