@@ -10,7 +10,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     init() {
-        console.log('data 0', this.data)
+        // console.log('data 0', this.data)
         this.tokenSparkline = new TokenSparkbar()
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
@@ -44,7 +44,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
 
     hover(d,i){
         const self = this
-        console.log('hover', i)
+        // console.log('hover', i)
         let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
             .style('border', '1px dashed purple')
             .attr('highlighted', false)
@@ -59,7 +59,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
 
     selectFirstToken() {
         const firstTokenId = this.innerDiv.select('.output-token').attr('position')
-        console.log('firstTokenId', firstTokenId)
+        // console.log('firstTokenId', firstTokenId)
         this.hover({position: firstTokenId}, 4)
     }
 
@@ -110,10 +110,10 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     updateData(attribution_list_id) {
-        console.log('data', this.data)
-        console.log('updateData', attribution_list_id)
+        // console.log('data', this.data)
+        // console.log('updateData', attribution_list_id)
         const newValues = this.data['attributions'][attribution_list_id]
-        console.log('newValues', newValues, this.data['attributions'])
+        // console.log('newValues', newValues, this.data['attributions'])
         let max = this.data['tokens'][0].value
         // Update the 'value' parameter of each token
         // So when self.setupTokenBoxes() is called, it updates

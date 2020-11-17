@@ -166,7 +166,7 @@ export class TextHighlighter {
 
         // Update the color scale used to highlight the tokens
         if(color){
-            console.log('color', color)
+            // console.log('color', color)
             this.config.bgColorInterpolator = d3.interpolateRgb("white", color)
             this.config.bgColorScaler =
                 d3.scaleLinear()
@@ -177,7 +177,7 @@ export class TextHighlighter {
 
     addToken(token){
         this.data['tokens'].push(token)
-        console.log(this.data['tokens'])
+        // console.log(this.data['tokens'])
     }
 
     redraw(){
