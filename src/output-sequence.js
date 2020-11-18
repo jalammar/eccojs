@@ -97,34 +97,24 @@ export function interactiveTokensAndFactorSparklines(parent_div, data, _config =
             d3array.maxIndex(
                 data['factors'][0], (f) => f[i]))
     })
-    // console.log('3', mostPronounceFactorPerToken)
+    // console.debug('3', mostPronounceFactorPerToken)
 
     let factorColorInterpolators = []
     let factorColorScalers = []
     data['factors'][0].map((values, i) => {
         let color = activationSparkline.lineColors(i)
-        // console.log('factor:', i, ' color', color)
+        // console.debug('factor:', i, ' color', color)
         factorColorInterpolators.push(d3.interpolateRgb("white", color))
         factorColorScalers.push(d3.scaleLinear()
             .domain([0, d3.max(values)])
             .range([0, 1]))
     })
-    // console.log('4', factorColorInterpolators, factorColorScalers)
+    // console.debug('4', factorColorInterpolators, factorColorScalers)
     // Update token color values
     for (let i = 0; i < data['tokens'].length; i++) {
         let factor_id = mostPronounceFactorPerToken[i]
-        // console.log('4.5', i, factor_id,
-        //     'value:', data['factors'][0][factor_id][i],
-        //     'scaled value: ', factorColorScalers[factor_id](
-        //         data['factors'][0][factor_id][i]
-        //     ),
-        //     'interpolated scaled value:',
-        //     factorColorInterpolators[factor_id](
-        //         factorColorScalers[factor_id](
-        //             data['factors'][0][factor_id][i]
-        //         )
-        //     )
-        // )
+        // console.debug('4.5', i, factor_id,
+
         data['tokens'][i]['color'] =
             factorColorInterpolators[factor_id](
                 factorColorScalers[factor_id](
@@ -132,7 +122,7 @@ export function interactiveTokensAndFactorSparklines(parent_div, data, _config =
                 )
             )
     }
-    // console.log('6 ', data['tokens'])
+    // console.debug('6 ', data['tokens'])
 
     highlighter.init();
     activationSparkline.hoverAction = function (id, color) {

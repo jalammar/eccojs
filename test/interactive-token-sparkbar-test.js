@@ -21,7 +21,7 @@ const window = (new JSDOM( doc, {
 // This is global because the tests will look for it in the global scope
 document = window.document;
 
-test('InteractiveTokenSparkbar.init() creates', function(test){
+test('InteractiveTokenSparkbar.init() sets up the visualization', function(test){
     const t = new ecco.InteractiveTokenSparkbar(data_2)
 
     t.init()
@@ -35,7 +35,7 @@ test('InteractiveTokenSparkbar.init() creates', function(test){
     test.equals(t.innerDiv.selectAll('svg').size(), 3,
         "three svgs were correctly created")
 
-    console.log(document.body.innerHTML)
+    // console.log(document.body.innerHTML)
     test.equals(t.innerDiv.selectAll('rect').size(), 3,
         "three rect (token sparkbars) were correctly created")
     t.selectFirstToken()
