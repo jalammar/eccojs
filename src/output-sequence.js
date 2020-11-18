@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-// import * as d3array from "d3array";
+import * as d3array from "d3-array";
 import {TextHighlighter} from "./text-highlighter.js"
 import {TinyChartTextHighlighter} from "./tiny-chart-text-highlighter.js"
 import {InteractiveTokenSparkbar} from "./interactive-token-sparkbar"
@@ -94,7 +94,7 @@ export function interactiveTokensAndFactorSparklines(parent_div, data, _config =
         // Find the factor that has the highest activation value for the token
         // save the factor id
         mostPronounceFactorPerToken.push(
-            d3.maxIndex(
+            d3array.maxIndex(
                 data['factors'][0], (f) => f[i]))
     })
     // console.log('3', mostPronounceFactorPerToken)

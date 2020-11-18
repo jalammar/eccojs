@@ -19,19 +19,22 @@ export default [
             name: 'eccoBundle'
         },
 
-        plugins: [nodeResolve(), commonjs()],
+        plugins: [
+            // nodeResolve(), commonjs()
+        ],
     },
 
     {
         input: 'main.js',
         output: {
-            file: 'dist/ecco-bundle.js',
+            file: 'dist/ecco-bundle.min.js',
             format: 'umd',
             name: 'eccoBundle',
             indent: false,
         },
 
-        plugins: [nodeResolve(), commonjs(),
+        plugins: [
+            //nodeResolve(), commonjs(),
             terser()],
     },
 ];

@@ -84,7 +84,7 @@ export class TextHighlighter {
                         .attr('value', (d, i) => d.value || 0)
                         .style('opacity', 0)
                         .style('background-color', (d, i) => {
-                            // console.log("bg", d, d.value)
+                            // console.debug("bg", d, d.value)
                             return self.bgColor(d)
                         })
                         .style('border-color', () => {
@@ -126,7 +126,7 @@ export class TextHighlighter {
     bgColor(token) {
         // If token explicitly has a color, use that
         // Case: using different colors for different factors in one view
-        // console.log('bgColor',(!this.config.overrideColorParam) ,  (token.color !== undefined))
+        // console.debug('bgColor',(!this.config.overrideColorParam) ,  (token.color !== undefined))
         if ((!this.config.overrideColorParam) && (token.color !== undefined)){
             return token.color
         }
@@ -166,7 +166,7 @@ export class TextHighlighter {
 
         // Update the color scale used to highlight the tokens
         if(color){
-            // console.log('color', color)
+            // console.debug('color', color)
             this.config.bgColorInterpolator = d3.interpolateRgb("white", color)
             this.config.bgColorScaler =
                 d3.scaleLinear()
@@ -177,7 +177,6 @@ export class TextHighlighter {
 
     addToken(token){
         this.data['tokens'].push(token)
-        // console.log(this.data['tokens'])
     }
 
     redraw(){

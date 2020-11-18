@@ -10,7 +10,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     init() {
-        // console.log('data 0', this.data)
+        console.debug('init. data:', this.data)
         this.tokenSparkline = new TokenSparkbar()
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
@@ -43,8 +43,14 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     hover(d,i){
+        //d is the data of the token being hovered over
+        // i is the index of the array in 'attributions' we switch the values to
+        // For attributions, there's one array for each output token.
+        // None for input tokens. So output token #4, if the first output token,
+        // gets the first attribution.
         const self = this
-        // console.log('hover', i)
+        let n_input_tokens = self.innerDiv.selectAll('.input-token').size()
+        console.debug('hover', d.position, i, n_input_tokens)
         let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
             .style('border', '1px dashed purple')
             .attr('highlighted', false)
@@ -53,13 +59,13 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
             .attr('highlighted', true)
             .style('border', '1px solid #8E24AA')
             .style('background-color', '#E1BEE7')
-        self.updateData(i)
+        self.updateData(d.position - n_input_tokens)
         self.setupTokenBoxes(self.data['tokens'])
     }
 
     selectFirstToken() {
         const firstTokenId = this.innerDiv.select('.output-token').attr('position')
-        // console.log('firstTokenId', firstTokenId)
+        console.debug('firstTokenId', firstTokenId)
         this.hover({position: firstTokenId}, 4)
     }
 
@@ -110,10 +116,10 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     updateData(attribution_list_id) {
-        // console.log('data', this.data)
-        // console.log('updateData', attribution_list_id)
+        console.debug('data', this.data)
+        console.debug('updateData', attribution_list_id)
         const newValues = this.data['attributions'][attribution_list_id]
-        // console.log('newValues', newValues, this.data['attributions'])
+        console.debug('newValues', newValues, this.data['attributions'])
         let max = this.data['tokens'][0].value
         // Update the 'value' parameter of each token
         // So when self.setupTokenBoxes() is called, it updates
@@ -129,7 +135,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
         this.tokenSparkline.config.colorScaler = d3.scaleLinear()
             .domain([0, max])
             .range(this.tokenSparkline.config.colorScaler.range())
-        // console.log('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
+        console.debug('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
 
         this.tokenSparkline.config.normalizeHeightScale = d3.scaleLinear()
             .domain([0, max])
