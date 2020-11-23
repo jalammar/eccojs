@@ -49,6 +49,7 @@ export class TextHighlighter {
         this.innerDiv.style('float', 'left')
             .style('float', 'left')
             .style('width', '70%')
+
         // Construct token boxes, most of the work is done here
         const token_boxes = this.setupTokenBoxes(this.data['tokens'])
 
