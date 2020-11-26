@@ -14,19 +14,6 @@ export default [
     {
         input: 'main.js',
         output: {
-            file: '..\\..\\PycharmProjects\\ecco\\ecco\\ecco-bundle.js',
-            format: 'umd',
-            name: 'eccoBundle'
-        },
-
-        plugins: [
-            // nodeResolve(), commonjs()
-        ],
-    },
-
-    {
-        input: 'main.js',
-        output: {
             file: 'dist/ecco-bundle.min.js',
             format: 'umd',
             name: 'eccoBundle',

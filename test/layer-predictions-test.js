@@ -15,15 +15,17 @@ const test = require('tape'),
     data_2 = {
         parentDiv: 'basic',
         data: [[
-            {token: 'one', prob: 0.5, ranking: 1},
-            {token: '…one', prob: 0.3, ranking: 2},
-            {token: 'friend', prob: 0.2, ranking: 3}
+            {token: ' one', prob: 1, ranking: 1},
+            {token: 'one partial', prob: 0.5, ranking: 2},
+            {token: 'one', prob: 0.3, ranking: 3},
+            {token: ' friend', prob: 0.2, ranking: 4},
+            {token: 'friend', prob: 0.00001, ranking: 5}
         ]]
     },
     data_3 = {
         parentDiv: 'basic',
         data: [[
-            {token: '" one"', prob: 0.3, ranking: 1},
+            {token: ' one', prob: 0.3, ranking: 1},
             {token: 'one', prob: 0.2, ranking: 2},
             {token: ' friend', prob: 0.1, ranking: 3}
         ],
@@ -116,7 +118,6 @@ test('LayerPredictions.draw() three layers 15 tokens each', function (test) {
 
     layerPred.init()
 
-    // console.log('[[[[[', document.body.innerHTML)
     preview_text =preview_text+ document.body.innerHTML + "<br />"
 
     console.log(d3.select(layerPred.innerDiv).size())
@@ -124,17 +125,9 @@ test('LayerPredictions.draw() three layers 15 tokens each', function (test) {
 })
 
 
-
-
-
-// console.log(123, typeof preview_text)
 test.onFinish(function(){
-    fs.writeFile('previews.html', preview_text, function (err) {
+    fs.writeFile('./test/tmp/previews.html', preview_text, function (err) {
         if (err) return console.log(err);
         // console.log(preview_text, '>> preview.html');
     });
 })
-fs.writeFile('helloworld.html', preview_text, function (err) {
-    if (err) return console.log(err);
-    // console.log('Hello World > helloworld.txt');
-});

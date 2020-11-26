@@ -11,7 +11,7 @@ export class TokenSparkbarBase {
             colorInterpolator: _config.colorInterpolator || d3.interpolateViridis,
             colorScaler: _config.colorScaler ||
                 d3.scaleLinear()
-                    .domain([0, 0.4]) //TODO: Change the domain when the values are set
+                    .domain([0, 0.4])
                     .range([0.85, 0]) // Reversed to make low values bright
         }
 
@@ -53,7 +53,7 @@ export class TokenSparkbar extends TokenSparkbarBase {
         // each will overwrite 'this'
 
         selection.each(function (d, i) {
-            console.log('sparkbar', d)
+            // console.log('sparkbar', d)
                 let value = parseFloat(d.value)
                 let svg = d3.select(this)
                     .insert('svg', ':first-child')

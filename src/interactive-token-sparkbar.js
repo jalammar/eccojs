@@ -7,11 +7,10 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     constructor(_config) {
         super(_config)
 
+        this.tokenSparkline = new TokenSparkbar(_config['tokenSparkbarConfig'])
     }
 
     init() {
-        console.debug('init. data:', this.data)
-        this.tokenSparkline = new TokenSparkbar()
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
 
@@ -19,15 +18,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
             // Construct token boxes, most of the work is done here
             token_boxes = this.setupTokenBoxes(self.data['tokens'])
 
-        // Hover listeners
-        this.innerDiv.selectAll('div.output-token')
-            .style('border','1px dashed purple')
-            .on("mouseenter", (d, i)=>{
-                self.hover(d,i)
-            })
-            .on("touchstart", (d,i)=>{
-                self.hover(d,i)
-            })
+        this.setupInteraction()
 
         // Input sequence indicator
         this.innerDiv
@@ -42,15 +33,25 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
             .html('output:')
     }
 
+    setupInteraction(){
+        // Hover listeners
+        this.innerDiv.selectAll('div.output-token')
+            .style('border','1px dashed purple')
+            .on("mouseenter", (d, i)=>{
+                self.hover(d,i)
+            })
+            .on("touchstart", (d,i)=>{
+                self.hover(d,i)
+            })
+    }
     hover(d,i){
         //d is the data of the token being hovered over
-        // i is the index of the array in 'attributions' we switch the values to
         // For attributions, there's one array for each output token.
         // None for input tokens. So output token #4, if the first output token,
         // gets the first attribution.
         const self = this
         let n_input_tokens = self.innerDiv.selectAll('.input-token').size()
-        console.debug('hover', d.position, i, n_input_tokens)
+        // console.debug('hover', d.position, i, n_input_tokens)
         let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
             .style('border', '1px dashed purple')
             .attr('highlighted', false)
@@ -65,7 +66,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
 
     selectFirstToken() {
         const firstTokenId = this.innerDiv.select('.output-token').attr('position')
-        console.debug('firstTokenId', firstTokenId)
+        // console.debug('firstTokenId', firstTokenId)
         this.hover({position: firstTokenId}, 4)
     }
 
@@ -116,11 +117,10 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     updateData(attribution_list_id) {
-        console.debug('data', this.data)
-        console.debug('updateData', attribution_list_id)
+
         const newValues = this.data['attributions'][attribution_list_id]
-        console.debug('newValues', newValues, this.data['attributions'])
-        let max = this.data['tokens'][0].value
+
+        let max = 0;
         // Update the 'value' parameter of each token
         // So when self.setupTokenBoxes() is called, it updates
         // whatever depends on 'value' (namely, bar sparkline, and its numeric value)
