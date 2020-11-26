@@ -2,11 +2,6 @@ version: 2.1
 orbs:
   node: circleci/node@4.0.0
 
-jobs:
-  build:
-    steps:
-      run: npm install
-
 workflows:
   matrix-tests:
     jobs:
