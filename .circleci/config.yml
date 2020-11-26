@@ -10,7 +10,6 @@ jobs:
 workflows:
   matrix-tests:
     jobs:
-      - build
       - node/test:
           matrix:
             parameters:
