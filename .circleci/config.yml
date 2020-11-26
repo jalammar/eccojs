@@ -2,6 +2,13 @@ version: 2.1
 orbs:
   node: circleci/node@4.0.0
 
+jobs:
+  artifacts:
+    steps:
+      - store_artifacts:
+          path: test/tmp
+
+
 workflows:
   matrix-tests:
     jobs:
@@ -12,5 +19,4 @@ workflows:
                 - 13.11.0
                 - 12.16.0
                 - 10.19.0
-      - store_artifacts:
-            path: test/tmp
+      - artifacts
