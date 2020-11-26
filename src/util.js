@@ -1,4 +1,4 @@
-import XRegExp from "XRegExp";
+import XRegExp from "xregexp";
 
 export function token_styler(selection) {
     // console.log('styler:', selection, typeof (selection), typeof ('hi'))
