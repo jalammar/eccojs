@@ -5,8 +5,8 @@ workflows:
   matrix-tests:
     jobs:
       - build:
-          - steps:
-              - run: npm install
+          steps:
+            run: npm install
       - node/test:
           matrix:
             parameters:
