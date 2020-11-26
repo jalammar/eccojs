@@ -127,7 +127,11 @@ test.onFinish(function () {
     })
     `)
 
-    fs.writeFile('./test/tmp/attention-token-sparkbar-previews.html', dom.serialize(), function (err) {
+    const dir = './test/tmp';
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+    fs.writeFile(dir + '/attention-token-sparkbar-previews.html', dom.serialize(), function (err) {
         if (err) return console.log(err);
         // console.log(preview_text, '>> preview.html');
     });

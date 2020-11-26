@@ -12,3 +12,5 @@ workflows:
                 - 13.11.0
                 - 12.16.0
                 - 10.19.0
+      - store_artifacts:
+            path: test/tmp

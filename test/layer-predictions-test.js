@@ -126,7 +126,12 @@ test('LayerPredictions.draw() three layers 15 tokens each', function (test) {
 
 
 test.onFinish(function(){
-    fs.writeFile('./test/tmp/previews.html', preview_text, function (err) {
+
+    const dir = './test/tmp';
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+    fs.writeFile(dir + '/previews.html', preview_text, function (err) {
         if (err) return console.log(err);
         // console.log(preview_text, '>> preview.html');
     });
