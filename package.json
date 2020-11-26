@@ -5,7 +5,7 @@
   "main": "dist/ecco-bundle.node.js",
   "module": "main.js",
   "scripts": {
-    "pretest": "rimraf dist && mkdir dist && json2module package.json > dist/package.js && rollup --config .\\rollup.config.js",
+    "pretest": "rimraf dist && mkdir dist && json2module package.json > dist/package.js && rollup --config rollup.config.js",
     "test": "tape test/**/*-test.js"
   },
   "keywords": [
@@ -15,7 +15,8 @@
     "animation"
   ],
   "author": "Jay Alammar",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
+
   "devDependencies": {
     "json2module": "0.0",
     "rimraf": "3",
