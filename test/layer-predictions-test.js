@@ -62,11 +62,13 @@ test('LogitBox.draw() creates a logit box', function (test) {
     console.log(0)
     const logit = new ecco.LogitBox(),
         g = d3.select(document).select('svg').append("g");
+    console.log(1)
     g.selectAll('g')
         .data(data_1.data.tokens)
         .join('g')
         .call(logit.draw.bind(logit))
 
+    console.log(2)
     // console.log(document.body.innerHTML)
     test.equals(g.selectAll('rect.logit').size(), 1,
         "Correctly created svg group")

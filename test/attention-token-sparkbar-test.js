@@ -39,7 +39,7 @@ const d3 = require('d3'),
                     'value': '0.03994041',
                     'position': 4
                 }, {'token': ' are', 'token_id': 389, 'type': 'output', 'value': '0', 'position': 5}],
-                'attributions': [[1.0, 0.0, 0.0, 0.0, 0.0],
+                'attentions': [[1.0, 0.0, 0.0, 0.0, 0.0],
                     [0.8602287173271179, 0.13977131247520447, 0.0, 0.0, 0.0], [0.7360638380050659, 0.15531973540782928, 0.1086164265871048, 0.0, 0.0], [0.7195126414299011, 0.10458766669034958, 0.12247469276189804, 0.05342503637075424, 0.0], [0.6824238300323486, 0.16033324599266052, 0.0663973018527031, 0.050905220210552216, 0.03994040936231613]]
             }
     },
@@ -53,6 +53,12 @@ const d3 = require('d3'),
 
 const fs = require("fs")
 let preview_text = ''
+
+
+let rawdata = fs.readFileSync('./test/data/distilgpt_attentions_1606375870000.json');
+
+let data_2 = Object.assign({},data_1)
+data_2.data = JSON.parse(rawdata);
 
 test('AttentionTokenSparkbar.init() creates token boxes', function (test) {
 
@@ -95,15 +101,15 @@ test.onFinish(function () {
 
     let dom = newDocument(doc)
     document = dom.window.document
-    console.log(2)
+    // console.log(2)
     d3.select(document.head).insert('script').attr('src', 'https://requirejs.org/docs/release/2.3.6/minified/require.js')
 
     d3.select(document.head).insert('link')
         .attr('rel','stylesheet' )
         .attr('type','text/css' )
-        .attr('href', 'dev-styles.css')
+        .attr('href', '../../dev/dev-styles.css')
 
-    console.log(3)
+    // console.log(3)
     d3.select(document.head).append('script').html(`
         requirejs.config({
             nodeRequire: require,
@@ -112,8 +118,8 @@ test.onFinish(function () {
                 "d3-array": "https://d3js.org/d3-array.v2.min",
                 jquery: "https://code.jquery.com/jquery-3.5.1.min",
                 katex: "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min",
-                ecco: '../dist/ecco-bundle.min',
-                XRegExp: 'https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min'
+                ecco: '../../dist/ecco-bundle.min',
+                xregexp: 'https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min'
             }
         });
     `);
@@ -121,7 +127,7 @@ test.onFinish(function () {
 
     d3.select(document.body).append('script').html(`
     require(['ecco'], function(ecco){
-    let data_1 = ${ JSON.stringify(data_1) }
+    let data_1 = ${ JSON.stringify(data_2) }
     let attention = new ecco.AttentionTokenSparkbar(data_1)
     attention.init()
     })

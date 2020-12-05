@@ -86,27 +86,27 @@ export class TokenSparkbar extends TokenSparkbarBase {
                     .attr("alignment-baseline", "top")
 
                 // Probability score text
-                const format_prob = (value * 100)
-                    .toFixed(2) + '%'
-                svg.append('text')
-                    .attr("x", 0)
-                    .attr("y", self.config.barMaxHeight +
-                        self.config.numericLabelHeight - 1)
-                    .text(value == 0? '': format_prob)
-                    // .attr("fill", "#EC008Cbb")
-                    .attr("fill", (d, i) => {
-                        if (parseFloat(d.value) === -1)
-                            return "white"
-                        else
-                            return self.config.colorInterpolator(
-                                self.config.colorScaler(value))
-                    })
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "10px")
-                    .attr("text-anchor", "left")
-                    .attr("alignment-baseline", "top")
-                    .attr('probability', value)
-                    // .style("pointer-events", "none")
+                // const format_prob = (value * 100)
+                //     .toFixed(2) + '%'
+                // svg.append('text')
+                //     .attr("x", 0)
+                //     .attr("y", self.config.barMaxHeight +
+                //         self.config.numericLabelHeight - 1)
+                //     .text(value == 0? '': format_prob)
+                //     // .attr("fill", "#EC008Cbb")
+                //     .attr("fill", (d, i) => {
+                //         if (parseFloat(d.value) === -1)
+                //             return "white"
+                //         else
+                //             return self.config.colorInterpolator(
+                //                 self.config.colorScaler(value))
+                //     })
+                //     .attr("font-family", "sans-serif")
+                //     .attr("font-size", "10px")
+                //     .attr("text-anchor", "left")
+                //     .attr("alignment-baseline", "top")
+                //     .attr('probability', value)
+                //     // .style("pointer-events", "none")
             }
         )
     }

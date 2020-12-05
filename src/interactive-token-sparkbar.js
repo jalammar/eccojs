@@ -17,9 +17,12 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
         const self = this,
             // Construct token boxes, most of the work is done here
             token_boxes = this.setupTokenBoxes(self.data['tokens'])
-
+        this.setupSequenceIndicators()
         this.setupInteraction()
 
+    }
+
+    setupSequenceIndicators(){
         // Input sequence indicator
         this.innerDiv
             .insert('div', ':first-child')//Insert at the beginning
@@ -34,6 +37,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
     }
 
     setupInteraction(){
+        const self = this
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
             .style('border','1px dashed purple')
@@ -44,6 +48,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
                 self.hover(d,i)
             })
     }
+
     hover(d,i){
         //d is the data of the token being hovered over
         // For attributions, there's one array for each output token.

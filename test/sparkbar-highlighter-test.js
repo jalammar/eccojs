@@ -169,8 +169,8 @@ const window = (new JSDOM(doc, {
 // This is global because the tests will look for it in the global scope
 document = window.document;
 
-test('InteractiveTokenSparkbar.init() sets up the visualization', function (test) {
-    const t = new ecco.InteractiveTokenSparkbar(data_2)
+test('SparkbarHighlighter.init() sets up the visualization', function (test) {
+    const t = new ecco.SparkbarHighlighter(data_2)
 
     t.init()
 
@@ -225,8 +225,8 @@ test.onFinish(function () {
 
     d3.select(document.body).append('script').html(`
     require(['ecco'], function(ecco){
-    let data_1 = ${JSON.stringify(data_3)}
-    let viz = new ecco.InteractiveTokenSparkbar(data_1)
+    let data = ${JSON.stringify(data_3)}
+    let viz = new ecco.SparkbarHighlighter(data)
     viz.init()
     })
     `)
@@ -235,7 +235,7 @@ test.onFinish(function () {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
-    fs.writeFile(dir + '/interactive-token-sparkbar-previews.html', dom.serialize(), function (err) {
+    fs.writeFile(dir + '/sparkbar-highlighter-preview.html', dom.serialize(), function (err) {
         if (err) return console.log(err);
         // console.log(preview_text, '>> preview.html');
     });
