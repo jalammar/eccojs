@@ -38,7 +38,7 @@ const test = require('tape'),
     newDocument = function(doc){
     return (new JSDOM(doc, {
             runScripts: "outside-only"
-        })).window.document;
+        }));
     }
 let data_4 = Object.assign({},data_3)
 let tokens_4=[]
@@ -58,17 +58,20 @@ const fs = require("fs")
 let preview_text = ''
 
 test('LogitBox.draw() creates a logit box', function (test) {
-    document = newDocument(doc)
-    console.log(0)
-    const logit = new ecco.LogitBox(),
-        g = d3.select(document).select('svg').append("g");
-    console.log(1)
+
+    let dom = newDocument(doc)
+    document = dom.window.document
+
+    const logit = new ecco.LogitBox()
+    // console.log('01')
+    const g = d3.select(document).select('svg').append("g");
+    // console.log(1)
     g.selectAll('g')
         .data(data_1.data.tokens)
         .join('g')
         .call(logit.draw.bind(logit))
 
-    console.log(2)
+    // console.log(2)
     // console.log(document.body.innerHTML)
     test.equals(g.selectAll('rect.logit').size(), 1,
         "Correctly created svg group")
@@ -78,13 +81,14 @@ test('LogitBox.draw() creates a logit box', function (test) {
     // logit.draw()
     preview_text =preview_text+ document.body.innerHTML + "<br />"
 
-    console.log('-----', preview_text)
+    // console.log('-----', preview_text)
     test.end()
 })
 
 
 test('LayerPredictions.draw() ', function (test) {
-    document = newDocument(doc_2)
+    let dom = newDocument(doc_2)
+    document = dom.window.document
 
     const layerPred = new ecco.LayerPredictions(data_2);
 
@@ -98,7 +102,8 @@ test('LayerPredictions.draw() ', function (test) {
 
 
 test('LayerPredictions.draw() two layers', function (test) {
-    document = newDocument(doc_2)
+    let dom = newDocument(doc_2)
+    document = dom.window.document
 
     const layerPred = new ecco.LayerPredictions(data_3);
 
@@ -114,7 +119,8 @@ test('LayerPredictions.draw() two layers', function (test) {
 
 
 test('LayerPredictions.draw() three layers 15 tokens each', function (test) {
-    document = newDocument(doc_2)
+    let dom = newDocument(doc_2)
+    document = dom.window.document
 
     const layerPred = new ecco.LayerPredictions(data_4);
 
@@ -122,7 +128,7 @@ test('LayerPredictions.draw() three layers 15 tokens each', function (test) {
 
     preview_text =preview_text+ document.body.innerHTML + "<br />"
 
-    console.log(d3.select(layerPred.innerDiv).size())
+    // console.log(d3.select(layerPred.innerDiv).size())
     test.end()
 })
 

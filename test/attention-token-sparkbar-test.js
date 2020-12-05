@@ -98,7 +98,7 @@ test('AttentionTokenSparkbar.init() sets up interactions for all except first to
 test.onFinish(function () {
 
     // Create preview html file:
-
+    console.log(44)
     let dom = newDocument(doc)
     document = dom.window.document
     // console.log(2)
