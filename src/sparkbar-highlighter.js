@@ -1,23 +1,47 @@
 import * as d3 from "d3";
-import {token_styler, display_token} from "./util.js"
+import {token_styler, display_token, viridisToWhite} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
 import {TokenSparkbar} from "./token-sparkbar.js";
 
 export class SparkbarHighlighter extends TextHighlighter {
     constructor(_config) {
-        super(_config)
+        _config['bgColorScaler'] = d3.scaleLinear()
+            .domain([0, 0.3])
+            .range([0, 1])
 
+        _config['bgColorInterpolator'] = d3.interpolateRgb("white", "purple")
+        // _config['bgColorInterpolator'] = d3.interpolateViridis
+        // _config['bgColorInterpolator'] = viridisToWhite()
+        // _config['bgColorInterpolator'] = d3.scaleLinear()
+        //     .domain(d3.ticks(0, 1, 10))
+        //     .range(["#5E4FA2", "#3288BD", "#66C2A5", "#ABDDA4", "#E6F598",
+        //         "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142"]);
+
+        // console.log('vv', d3.interpolateViridis)
+
+        // _config['bgColorScaler'] = d3.scaleLinear()
+        //     .domain([0, 0.4]) //[0, 0.4]
+        //     .range([1, 0])
+
+        _config['textColorInterpolator'] = (v) => {
+            let bg_color = this.config.bgColorScaler(v)
+            if (bg_color > 0.5) return "white"
+            else return "black"
+        }
+
+        super(_config)
         this.tokenSparkline = new TokenSparkbar(_config['tokenSparkbarConfig'])
     }
 
     init() {
         this.div = d3.select('#' + this.parentDivId)
-        this.innerDiv = this.div.append('div').attr('class', 'container')
+        this.innerDiv = this.div.append('div')
+            .attr('class', 'container minimal')
 
-        this.inputRow = this.innerDiv.append('div').attr('class', 'row')
-        this.inputTokensDiv = this.inputRow.append('div').attr('class', 'col-sm-10')
-        this.outputRow = this.innerDiv.append('div').attr('class', 'row')
-        this.outputTokensDiv = this.outputRow.append('div').attr('class', 'col-sm-10')
+        // this.inputRow = this.innerDiv.append('div').attr('class', 'row')
+        // this.inputTokensDiv = this.inputRow.append('div').attr('class', 'col-sm-10')
+        // this.outputRow = this.innerDiv.append('div').attr('class', 'row')
+        // this.outputTokensDiv = this.outputRow.append('div').attr('class', 'col-sm-10')
 
         const self = this,
             // Construct token boxes, most of the work is done here
@@ -29,23 +53,23 @@ export class SparkbarHighlighter extends TextHighlighter {
 
     setupSequenceIndicators() {
         // Input sequence indicator
-        this.inputRow
-            .insert('div', ':first-child')//Insert at the beginning
-            .attr('class', 'sequence-indicator inputs-indicator col-sm-2')
-            .html('input')
-
-        // Output sequence indicator
-        this.outputRow
-            .insert('div', ':first-child') //Insert before the first output token
-            .attr('class', 'sequence-indicator outputs-indicator col-sm-2')
-            .html('output')
+        // this.inputRow
+        //     .insert('div', ':first-child')//Insert at the beginning
+        //     .attr('class', 'sequence-indicator inputs-indicator col-sm-2')
+        //     .html('input')
+        //
+        // // Output sequence indicator
+        // this.outputRow
+        //     .insert('div', ':first-child') //Insert before the first output token
+        //     .attr('class', 'sequence-indicator outputs-indicator col-sm-2')
+        //     .html('output')
     }
 
     setupInteraction() {
         const self = this
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
-            .style('border', '1px dashed purple')
+            // .style('border', '1px dashed purple')
             .on("mouseenter", (d, i) => {
                 self.hover(d, i)
             })
@@ -63,15 +87,18 @@ export class SparkbarHighlighter extends TextHighlighter {
         let n_input_tokens = self.innerDiv.selectAll('.input-token').size()
         // console.debug('hover', d, d.position, i, n_input_tokens, self.innerDiv)
         let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
-            // .style('border', '1px dashed purple')
+            // .style('border', '0')
+            .classed('selected', false)
             .attr('highlighted', false)
             .style('background-color', '')
+            // .style('border-bottom', '')
         // console.log('hover2', self.innerDiv.selectAll(`.token`).filter((d_)=>d_.position == d.position).size())
         let s = self.innerDiv.selectAll(`.token`)
-            .filter((d_)=>d_.position == d.position)
+            .filter((d_) => d_.position == d.position)
+            .classed('selected', true)
             .attr('highlighted', true)
-            // .style('border', '1px solid #8E24AA')
-            .style('background-color', '#aaa')
+            // .style('border-bottom', '4px solid black')
+            // .style('background-color', '#aaa')
         self.updateData(d.position - n_input_tokens)
         self.setupTokenBoxes(self.data['tokens'])
     }
@@ -89,8 +116,8 @@ export class SparkbarHighlighter extends TextHighlighter {
             .domain([0, 1]) //TODO: Change the domain when the values are set
             .range([1, 0])
 
-        const input_token_boxes = this.inputTokensDiv.selectAll('div.token')
-            .data(tokenData.filter((d) => d.type == "input"),
+        const token_boxes = this.innerDiv.selectAll('div.token')
+            .data(tokenData,
                 (d, i) => d['position']
             )
             .join(
@@ -98,21 +125,28 @@ export class SparkbarHighlighter extends TextHighlighter {
                 update => self.update(update)
             )
 
-
-        const output_token_boxes = this.outputTokensDiv.selectAll('div.token')
-            .data(tokenData.filter((d) => d.type == "output"),
-                (d, i) => d['position']
-            )
-            .join(
-                enter => self.enter(enter),
-                update => self.update(update)
-            )
+        // const input_token_boxes = this.inputTokensDiv.selectAll('div.token')
+        //     .data(tokenData.filter((d) => d.type == "input"),
+        //         (d, i) => d['position']
+        //     )
+        //     .join(
+        //         enter => self.enter(enter),
+        //         update => self.update(update)
+        //     )
+        // const output_token_boxes = this.outputTokensDiv.selectAll('div.token')
+        //     .data(tokenData.filter((d) => d.type == "output"),
+        //         (d, i) => d['position']
+        //     )
+        //     .join(
+        //         enter => self.enter(enter),
+        //         update => self.update(update)
+        //     )
 
         // return token_boxes
     }
 
     enter(selection) {
-        console.log('enter', selection)
+        // console.log('enter', selection)
         const self = this
         // selection.each(function(d,i){
         selection.append('div')
@@ -125,7 +159,8 @@ export class SparkbarHighlighter extends TextHighlighter {
             .style('color', (d, i) =>
                 self.textColor(d.value))
             .style('background-color', (d) => {
-                    // return self.bgColor(d)
+                    // console.log('bggg', d)
+                    return self.bgColor(d)
                 }
             )
             .call(token_styler)
@@ -134,21 +169,29 @@ export class SparkbarHighlighter extends TextHighlighter {
                     .text(function (d) {
                         return display_token(d.token)
                     })
-                    .style('margin-left', '-23px') // Makes the text closer to the tiny barchart
-                    .style("pointer-events", "none")
+                // .style('margin-left', '-23px') // Makes the text closer to the tiny barchart
+                // .style("pointer-events", "none")
 
-                d3.select(this)
-                    .call(self.tokenSparkline.draw.bind(self.tokenSparkline))
+                // d3.select(this)
+                //     .call(self.tokenSparkline.draw.bind(self.tokenSparkline))
             })
         // })
 
     }
 
     update(selection) {
+        // console.log('update', selection)
         const self = this
-        selection.each(function (d) {
-                d3.select(this).call(self.tokenSparkline.update.bind(self.tokenSparkline))
+        selection
+            .attr('value', (d, i) => d.value || 0)
+            .style('background-color', (d) => {
+                return self.bgColor(d)
             })
+            .selectAll('span')
+            .style('color', (d, i) =>
+                self.textColor(d.value))
+        // d3.select(this).call(self.tokenSparkline.update.bind(self.tokenSparkline))
+
     }
 
     updateData(attribution_list_id) {
@@ -165,12 +208,16 @@ export class SparkbarHighlighter extends TextHighlighter {
                 max = this.data['tokens'][i].value
         }
 
+        this.config.bgColorScaler = d3.scaleLinear()
+            .domain([0, max])
+            .range([0,1])
+
         // Set the max value as the new top of the domain for the sparkline
         // -- Both for color and for bar height
         this.tokenSparkline.config.colorScaler = d3.scaleLinear()
             .domain([0, max])
             .range(this.tokenSparkline.config.colorScaler.range())
-        console.debug('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
+        // console.debug('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
 
         this.tokenSparkline.config.normalizeHeightScale = d3.scaleLinear()
             .domain([0, max])

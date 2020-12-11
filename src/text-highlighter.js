@@ -127,7 +127,7 @@ export class TextHighlighter {
     bgColor(token) {
         // If token explicitly has a color, use that
         // Case: using different colors for different factors in one view
-        // console.debug('bgColor',(!this.config.overrideColorParam) ,  (token.color !== undefined))
+        // console.debug('bgColor',token, (!this.config.overrideColorParam) ,  (token.color !== undefined))
         if ((!this.config.overrideColorParam) && (token.color !== undefined)){
             return token.color
         }
@@ -141,8 +141,10 @@ export class TextHighlighter {
     };
 
     textColor(value) {
+        // console.log('textColor', value )
         const scaledValue = this.config.textColorScaler(value)
         if (this.config.textColorInterpolator) {
+            // console.log('textColorInterpolator', this.config.textColorInterpolator(scaledValue))
             return this.config.textColorInterpolator(scaledValue)
         }
         // else if (scaledValue > 0.4)
