@@ -3,13 +3,58 @@ import {token_styler, display_token, viridisToWhite} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
 import {TokenSparkbar} from "./token-sparkbar.js";
 
-export class SparkbarHighlighter extends TextHighlighter {
-    constructor(_config) {
-        _config['bgColorScaler'] = d3.scaleLinear()
-            .domain([0, 0.3])
-            .range([0, 1])
+// Viridis
 
-        _config['bgColorInterpolator'] = d3.interpolateRgb("white", "purple")
+const viridis_config = {
+    bgColorScaler: d3.scaleLinear()
+        .domain([0, 1]) //[0, 0.4]
+        .range([1,0]),
+    bgColorInterpolator: viridisToWhite()
+}
+
+
+// _config['bgColorInterpolator'] = viridisToWhite()
+// _config['bgColorScaler'] = d3.scaleLinear()
+//     .domain([0, 0.4]) //[0, 0.4]
+//     .range([1, 0])
+// }
+
+// Purple
+const purple_config = {
+    bgColorScaler: d3.scaleLinear()
+        .domain([0, 0.3])
+        .range([0, 1]),
+    bgColorInterpolator: d3.interpolateRgb("white", "purple")
+}
+
+
+export class MinimalHighlighter extends TextHighlighter {
+    constructor(_config) {
+        // console.log('_config', _config)
+        if ("preset" in _config) {
+            switch (_config.preset) {
+                case "viridis":
+                    _config = {..._config, ...viridis_config}
+                    break;
+                case "purple":
+                    _config = {..._config, ...purple_config}
+                    break;
+            }
+            // console.log('Using preset', _config)
+        }
+        // console.log('after preset block')
+
+        // _config['bgColorScaler'] = d3.scaleLinear()
+        //     .domain([0, 0.3])
+        //     .range([0, 1])
+        // _config['bgColorInterpolator'] = d3.interpolateRgb("white", "purple")
+        // _config['textColorInterpolator'] = (v) => {
+        //     let bg_color = this.config.bgColorScaler(v)
+        //     if (bg_color > 0.5) return "white"
+        //     else return "black"
+        // }
+
+
         // _config['bgColorInterpolator'] = d3.interpolateViridis
         // _config['bgColorInterpolator'] = viridisToWhite()
         // _config['bgColorInterpolator'] = d3.scaleLinear()
@@ -23,11 +68,11 @@ export class SparkbarHighlighter extends TextHighlighter {
         //     .domain([0, 0.4]) //[0, 0.4]
         //     .range([1, 0])
 
-        _config['textColorInterpolator'] = (v) => {
-            let bg_color = this.config.bgColorScaler(v)
-            if (bg_color > 0.5) return "white"
-            else return "black"
-        }
+        // _config['textColorInterpolator'] = (v) => {
+        //     let bg_color = this.config.bgColorScaler(v)
+        //     if (bg_color > 0.5) return "white"
+        //     else return "black"
+        // }
 
         super(_config)
         this.tokenSparkline = new TokenSparkbar(_config['tokenSparkbarConfig'])
@@ -91,14 +136,14 @@ export class SparkbarHighlighter extends TextHighlighter {
             .classed('selected', false)
             .attr('highlighted', false)
             .style('background-color', '')
-            // .style('border-bottom', '')
+        // .style('border-bottom', '')
         // console.log('hover2', self.innerDiv.selectAll(`.token`).filter((d_)=>d_.position == d.position).size())
         let s = self.innerDiv.selectAll(`.token`)
             .filter((d_) => d_.position == d.position)
             .classed('selected', true)
             .attr('highlighted', true)
-            // .style('border-bottom', '4px solid black')
-            // .style('background-color', '#aaa')
+        // .style('border-bottom', '4px solid black')
+        // .style('background-color', '#aaa')
         self.updateData(d.position - n_input_tokens)
         self.setupTokenBoxes(self.data['tokens'])
     }
@@ -157,7 +202,7 @@ export class SparkbarHighlighter extends TextHighlighter {
             .attr('position', (d, i) => i)
             .attr('value', (d, i) => d.value || 0)
             .style('color', (d, i) =>
-                self.textColor(d.value))
+                self.autoTextColor(d))
             .style('background-color', (d) => {
                     // console.log('bggg', d)
                     return self.bgColor(d)
@@ -189,7 +234,7 @@ export class SparkbarHighlighter extends TextHighlighter {
             })
             .selectAll('span')
             .style('color', (d, i) =>
-                self.textColor(d.value))
+                self.autoTextColor(d))
         // d3.select(this).call(self.tokenSparkline.update.bind(self.tokenSparkline))
 
     }
@@ -208,9 +253,10 @@ export class SparkbarHighlighter extends TextHighlighter {
                 max = this.data['tokens'][i].value
         }
 
+        // Normalize the color range so the highest value get the darkest color
         this.config.bgColorScaler = d3.scaleLinear()
             .domain([0, max])
-            .range([0,1])
+            .range(this.config.bgColorScaler.range())
 
         // Set the max value as the new top of the domain for the sparkline
         // -- Both for color and for bar height
@@ -224,3 +270,8 @@ export class SparkbarHighlighter extends TextHighlighter {
             .range(this.tokenSparkline.config.normalizeHeightScale.range())
     }
 }
+
+
+// Configurations
+
+// white-to-Viridis

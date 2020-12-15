@@ -5,6 +5,7 @@ const d3 = require('d3'),
     "<body><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css\" integrity=\"sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2\" crossorigin=\"anonymous\">\n<link id='css' rel=\"stylesheet\" type=\"text/css\" href=\"https://storage.googleapis.com/ml-intro/ecco/html/styles.css\"><div id='basic'></div></body></html>",
     data_2 = {
         parentDiv: 'basic',
+        preset: 'purple',
         data: {
             tokens: [
                 {token: ' hi', type: 'input', position: 0, value: 0.80},
@@ -19,6 +20,8 @@ const d3 = require('d3'),
     },
     data_3 = {
         parentDiv: 'basic',
+
+        preset: 'purple',
         data: {
             'tokens': [{
                 'token': 'The',
@@ -158,6 +161,7 @@ const d3 = require('d3'),
     },
     data_4 = {
         parentDiv: 'basic',
+        preset: 'viridis',
         data: {
             'tokens': [{
                 'token': 'What',
@@ -7957,8 +7961,8 @@ const window = (new JSDOM(doc, {
 // This is global because the tests will look for it in the global scope
 document = window.document;
 
-test('SparkbarHighlighter.init() sets up the visualization', function (test) {
-    const t = new ecco.SparkbarHighlighter(data_2)
+test('MinimalHighlighter.init() sets up the visualization', function (test) {
+    const t = new ecco.MinimalHighlighter(data_2)
 
     t.init()
 
@@ -8015,7 +8019,7 @@ test.onFinish(function () {
     d3.select(document.body).append('script').html(`
     require(['ecco'], function(ecco){
     let data = ${JSON.stringify(data_4)}
-    let viz = new ecco.SparkbarHighlighter(data)
+    let viz = new ecco.MinimalHighlighter(data)
     viz.init()
     })
     `)
@@ -8024,7 +8028,7 @@ test.onFinish(function () {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
-    fs.writeFile(dir + '/sparkbar-highlighter-preview.html', dom.serialize(), function (err) {
+    fs.writeFile(dir + '/minimal-highlighter-preview.html', dom.serialize(), function (err) {
         if (err) return console.log(err);
         // console.log(preview_text, '>> preview.html');
     });

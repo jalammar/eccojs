@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import {token_styler, display_token} from "./util.js"
+import {token_styler, display_token, rgbToLuma} from "./util.js"
 
 export class TextHighlighter {
 
@@ -132,15 +132,19 @@ export class TextHighlighter {
             return token.color
         }
         // If no explicit color, interpolate using value
-        else if (token.value !== undefined)
+        else if (token.value !== undefined){
+
             return this.config.bgColorInterpolator(
                 this.config.bgColorScaler(token.value))
+
+        }
         // If no Value, white background
         else
             return "white"
     };
 
     textColor(value) {
+
         // console.log('textColor', value )
         const scaledValue = this.config.textColorScaler(value)
         if (this.config.textColorInterpolator) {
@@ -150,9 +154,28 @@ export class TextHighlighter {
         // else if (scaledValue > 0.4)
         //     return '#ffffff'
         else
-            return '#000000'
-    };
+            return '#000000';
+    }
 
+    autoTextColor(token){
+
+        let bgColor = this.bgColor(token)
+
+        let luma_ = rgbToLuma(bgColor)
+
+            if (luma_ > 0.5)
+                return "black"
+            else
+                return "white"
+        //
+        // let hslBGColor = rgbToHsl(bgColor)
+        // console.log('BG COLOR!', bgColor, hslBGColor)
+        //
+        // if (hslBGColor[2] < 0.72)
+        //     return "white"
+        // else
+        //     return "black"
+    }
 
     updateData(id, color = null) {
         const newValues = this.data[this.config.valuesKey][0][id]
