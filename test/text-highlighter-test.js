@@ -23,8 +23,8 @@ test('TextHighlighter.init() creates the correct number of tokens and input/outp
     // console.log(document.body.innerHTML)
     // console.log(44, t.innerDiv.selectAll('.sequence-indicator').size())
     test.equals(t.innerDiv.selectAll('.sequence-indicator').size(),
-        2,
-        "'input' and 'output' sequence indicators were created.")
+        1,
+        "'output' sequence indicators was created.")
     test.equals(t.innerDiv.selectAll('.token').size(), 3,
         "Three token divs correctly created.") // 3 tokens in the initializer
     test.end()

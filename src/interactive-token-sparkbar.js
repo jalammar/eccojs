@@ -24,27 +24,27 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
 
     setupSequenceIndicators(){
         // Input sequence indicator
-        this.innerDiv
-            .insert('div', ':first-child')//Insert at the beginning
-            .attr('class', 'sequence-indicator inputs-indicator')
-            .html('input:')
+        // this.innerDiv
+        //     .insert('div', ':first-child')//Insert at the beginning
+        //     .attr('class', 'sequence-indicator inputs-indicator')
+        //     .html('input:')
 
         // Output sequence indicator
         this.innerDiv
             .insert('div', '.output-token') //Insert before the first output token
             .attr('class', 'sequence-indicator outputs-indicator')
-            .html('output:')
+            .html('>>')
     }
 
     setupInteraction(){
         const self = this
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
-            .style('border','1px dashed purple')
-            .on("mouseenter", (d, i)=>{
+            // .style('border','1px dashed purple')
+            .on("mouseenter", (event, d, i)=>{
                 self.hover(d,i)
             })
-            .on("touchstart", (d,i)=>{
+            .on("touchstart", (event, d,i)=>{
                 self.hover(d,i)
             })
     }
@@ -58,12 +58,15 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
         let n_input_tokens = self.innerDiv.selectAll('.input-token').size()
         // console.debug('hover', d.position, i, n_input_tokens)
         let disableHighlight = self.innerDiv.selectAll(`[highlighted="${true}"]`)
-            .style('border', '1px dashed purple')
+            // .style('border', '1px dashed purple')
             .attr('highlighted', false)
+
+            .classed('selected', false)
             .style('background-color', '')
         let s = self.innerDiv.selectAll(`[position="${d.position}"]`)
             .attr('highlighted', true)
-            .style('border', '1px solid #8E24AA')
+            .classed('selected', true)
+            // .style('border', '1px solid #8E24AA')
             .style('background-color', '#E1BEE7')
         self.updateData(d.position - n_input_tokens)
         self.setupTokenBoxes(self.data['tokens'])
@@ -106,7 +109,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
                                 .text(function (d) {
                                     return display_token(d.token)
                                 })
-                                .style('margin-left', '-13px') // Makes the text closer to the tiny barchart
+                                .style('margin-left', '-23px') // Makes the text closer to the tiny barchart
                                 .style("pointer-events", "none")
 
                             d3.select(this)
@@ -140,7 +143,7 @@ export class InteractiveTokenSparkbar extends TextHighlighter {
         this.tokenSparkline.config.colorScaler = d3.scaleLinear()
             .domain([0, max])
             .range(this.tokenSparkline.config.colorScaler.range())
-        console.debug('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
+        // console.debug('UPDATING DOMAIN', this.tokenSparkline.config.colorScaler.domain())
 
         this.tokenSparkline.config.normalizeHeightScale = d3.scaleLinear()
             .domain([0, max])

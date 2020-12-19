@@ -110,19 +110,19 @@ export class AttentionTokenSparkbar extends InteractiveTokenSparkbar {
         this.innerDiv.selectAll('div.token')
             .filter((d)=>{return d.position !== 0})
             .classed('attn-hoverable-token', true)
-            .on("mouseenter", (d, i) => {
+            .on("mouseenter", (event, d, i) => {
                 self.hover(d, i)
             })
-            .on("touchstart", (d, i) => {
+            .on("touchstart", (event, d, i) => {
                 self.hover(d, i)
             })
 
 
         this.layerPickerDiv.selectAll('rect.layer-box')
-            .on("mouseenter", function(d,i){
+            .on("mouseenter", function(event, d,i){
                 self.layerHover(d3.select(this).attr('layer_num'))
             })
-            .on("touchstart", (d, i) => {
+            .on("touchstart", (event, d, i) => {
                 self.layerHover(d3.select(this).attr('layer_num'))
             })
     }

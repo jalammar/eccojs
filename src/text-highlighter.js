@@ -55,16 +55,16 @@ export class TextHighlighter {
 
 
         // Show where inputs start
-        this.innerDiv
-            .insert('div', ':first-child')//Insert at the beginning
-            .attr('class', 'sequence-indicator inputs-indicator')
-            .html('input:')
+        // this.innerDiv
+        //     .insert('div', ':first-child')//Insert at the beginning
+        //     .attr('class', 'sequence-indicator inputs-indicator')
+        //     .html('input:')
 
         // Show where the output sequence starts
         this.innerDiv
             .insert('div', '.output-token') //Insert before the first output token
             .attr('class', 'sequence-indicator outputs-indicator')
-            .html('output:')
+            .html('>>')
 
     }
 
@@ -138,9 +138,9 @@ export class TextHighlighter {
                 this.config.bgColorScaler(token.value))
 
         }
-        // If no Value, white background
-        else
-            return "white"
+        //
+        // else
+        //     return "white"
     };
 
     textColor(value) {
@@ -178,6 +178,7 @@ export class TextHighlighter {
     }
 
     updateData(id, color = null) {
+        console.log('update data', id, color)
         const newValues = this.data[this.config.valuesKey][0][id]
 
         // let max = this.data['tokens'][0].value

@@ -3,30 +3,6 @@ import {token_styler, display_token, viridisToWhite} from "./util.js"
 import {TextHighlighter} from "./text-highlighter.js"
 import {TokenSparkbar} from "./token-sparkbar.js";
 
-// Viridis
-
-const viridis_config = {
-    bgColorScaler: d3.scaleLinear()
-        .domain([0, 1]) //[0, 0.4]
-        .range([1,0]),
-    bgColorInterpolator: viridisToWhite()
-}
-
-
-// _config['bgColorInterpolator'] = viridisToWhite()
-// _config['bgColorScaler'] = d3.scaleLinear()
-//     .domain([0, 0.4]) //[0, 0.4]
-//     .range([1, 0])
-// }
-
-// Purple
-const purple_config = {
-    bgColorScaler: d3.scaleLinear()
-        .domain([0, 0.3])
-        .range([0, 1]),
-    bgColorInterpolator: d3.interpolateRgb("white", "purple")
-}
-
 
 export class MinimalHighlighter extends TextHighlighter {
     constructor(_config) {
@@ -42,38 +18,6 @@ export class MinimalHighlighter extends TextHighlighter {
             }
             // console.log('Using preset', _config)
         }
-        // console.log('after preset block')
-
-        // _config['bgColorScaler'] = d3.scaleLinear()
-        //     .domain([0, 0.3])
-        //     .range([0, 1])
-        // _config['bgColorInterpolator'] = d3.interpolateRgb("white", "purple")
-        // _config['textColorInterpolator'] = (v) => {
-        //     let bg_color = this.config.bgColorScaler(v)
-        //     if (bg_color > 0.5) return "white"
-        //     else return "black"
-        // }
-
-
-        // _config['bgColorInterpolator'] = d3.interpolateViridis
-        // _config['bgColorInterpolator'] = viridisToWhite()
-        // _config['bgColorInterpolator'] = d3.scaleLinear()
-        //     .domain(d3.ticks(0, 1, 10))
-        //     .range(["#5E4FA2", "#3288BD", "#66C2A5", "#ABDDA4", "#E6F598",
-        //         "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142"]);
-
-        // console.log('vv', d3.interpolateViridis)
-
-        // _config['bgColorScaler'] = d3.scaleLinear()
-        //     .domain([0, 0.4]) //[0, 0.4]
-        //     .range([1, 0])
-
-        // _config['textColorInterpolator'] = (v) => {
-        //     let bg_color = this.config.bgColorScaler(v)
-        //     if (bg_color > 0.5) return "white"
-        //     else return "black"
-        // }
-
         super(_config)
         this.tokenSparkline = new TokenSparkbar(_config['tokenSparkbarConfig'])
     }
@@ -81,12 +25,7 @@ export class MinimalHighlighter extends TextHighlighter {
     init() {
         this.div = d3.select('#' + this.parentDivId)
         this.innerDiv = this.div.append('div')
-            .attr('class', 'container minimal')
-
-        // this.inputRow = this.innerDiv.append('div').attr('class', 'row')
-        // this.inputTokensDiv = this.inputRow.append('div').attr('class', 'col-sm-10')
-        // this.outputRow = this.innerDiv.append('div').attr('class', 'row')
-        // this.outputTokensDiv = this.outputRow.append('div').attr('class', 'col-sm-10')
+            .attr('class', 'minimal')
 
         const self = this,
             // Construct token boxes, most of the work is done here
@@ -104,10 +43,10 @@ export class MinimalHighlighter extends TextHighlighter {
         //     .html('input')
         //
         // // Output sequence indicator
-        // this.outputRow
-        //     .insert('div', ':first-child') //Insert before the first output token
-        //     .attr('class', 'sequence-indicator outputs-indicator col-sm-2')
-        //     .html('output')
+        this.innerDiv
+            .insert('div', '.output-token') //Insert before the first output token
+            .attr('class', 'sequence-indicator outputs-indicator')
+            .html('>>')
     }
 
     setupInteraction() {
@@ -115,15 +54,16 @@ export class MinimalHighlighter extends TextHighlighter {
         // Hover listeners
         this.innerDiv.selectAll('div.output-token')
             // .style('border', '1px dashed purple')
-            .on("mouseenter", (d, i) => {
+            .on("mouseenter", (event, d, i) => {
                 self.hover(d, i)
             })
-            .on("touchstart", (d, i) => {
+            .on("touchstart", (event, d, i) => {
                 self.hover(d, i)
             })
     }
 
     hover(d, i) {
+        console.log('hover', d, i)
         //d is the data of the token being hovered over
         // For attributions, there's one array for each output token.
         // None for input tokens. So output token #4, if the first output token,
@@ -240,8 +180,10 @@ export class MinimalHighlighter extends TextHighlighter {
     }
 
     updateData(attribution_list_id) {
+        console.log('attribution_list_id', attribution_list_id)
 
         const newValues = this.data['attributions'][attribution_list_id]
+        const self = this;
 
         let max = 0;
         // Update the 'value' parameter of each token
@@ -274,4 +216,18 @@ export class MinimalHighlighter extends TextHighlighter {
 
 // Configurations
 
-// white-to-Viridis
+// Viridis
+const viridis_config = {
+    bgColorScaler: d3.scaleLinear()
+        .domain([0, 1]) //[0, 0.4]
+        .range([1,0]),
+    bgColorInterpolator: viridisToWhite()
+}
+
+// Purple
+const purple_config = {
+    bgColorScaler: d3.scaleLinear()
+        .domain([0, 0.3])
+        .range([0, 1]),
+    bgColorInterpolator: d3.interpolateRgb("white", "purple")
+}

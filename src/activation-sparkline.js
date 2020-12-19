@@ -117,19 +117,26 @@ export class ActivationSparklineBase {
             .attr("d", line)
 
         // Draw another line, same path, but fatter so interaction is easier
-        groups.append('path')
+        let paths = groups.append('path')
             .attr("fill", "none")
             .attr("opacity", 0)
             .attr("stroke-width", 30)
             .attr("stroke", (d, i) => this.lineColors(i))
-            .attr("d", line)
-            .on("mouseenter",  (d, i)=> {
+            .attr("d", line);
+
+        paths.on("mouseenter",  function(){
+                const e = paths.nodes();
+                const i = e.indexOf(this);
                 self.hover(i, self.lineColors(i))
             })
-            .on("touchstart",  (d, i)=> {
+            .on("touchstart",  function(){
+                const e = groups.nodes();
+                const i = e.indexOf(this);
                 self.hover(i, self.lineColors(i))
             })
-            .on('mouseleave', (d,i)=>{
+            .on('mouseleave', function(){
+                const e = groups.nodes();
+                const i = e.indexOf(this);
                 self.hoverEnd(i, self.lineColors(i))
             })
             // .on('touchend', (d,i)=>{

@@ -1,5 +1,5 @@
 {
-  "name": "ecco",
+  "name": "eccojs",
   "version": "0.0.4",
   "description": "Charts and visualizations for machine learning language models. Part of ecco.ml.",
   "main": "dist/ecco-bundle.node.js",

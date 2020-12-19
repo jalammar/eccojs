@@ -12,7 +12,8 @@ export class TokenSparkbarBase {
             colorScaler: _config.colorScaler ||
                 d3.scaleLinear()
                     .domain([0, 0.4])
-                    .range([0.85, 0]) // Reversed to make low values bright
+                    .range([0.85, 0]), // Reversed to make low values bright
+            display_prob_score: _config.display_prob_score || true
         }
 
         this.config.barMaxHeight = _config.barMaxHeight ||
@@ -86,26 +87,28 @@ export class TokenSparkbar extends TokenSparkbarBase {
                     .attr("alignment-baseline", "top")
 
                 // Probability score text
-                // const format_prob = (value * 100)
-                //     .toFixed(2) + '%'
-                // svg.append('text')
-                //     .attr("x", 0)
-                //     .attr("y", self.config.barMaxHeight +
-                //         self.config.numericLabelHeight - 1)
-                //     .text(value == 0? '': format_prob)
-                //     // .attr("fill", "#EC008Cbb")
-                //     .attr("fill", (d, i) => {
-                //         if (parseFloat(d.value) === -1)
-                //             return "white"
-                //         else
-                //             return self.config.colorInterpolator(
-                //                 self.config.colorScaler(value))
-                //     })
-                //     .attr("font-family", "sans-serif")
-                //     .attr("font-size", "10px")
-                //     .attr("text-anchor", "left")
-                //     .attr("alignment-baseline", "top")
-                //     .attr('probability', value)
+            if (self.config.display_prob_score){
+                const format_prob = (value * 100)
+                    .toFixed(2) + '%'
+                svg.append('text')
+                    .attr("x", 0)
+                    .attr("y", self.config.barMaxHeight +
+                        self.config.numericLabelHeight - 1)
+                    .text(value == 0? '': format_prob)
+                    // .attr("fill", "#EC008Cbb")
+                    .attr("fill", (d, i) => {
+                        if (parseFloat(d.value) === -1)
+                            return "white"
+                        else
+                            return self.config.colorInterpolator(
+                                self.config.colorScaler(value))
+                    })
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .attr("text-anchor", "left")
+                    .attr("alignment-baseline", "top")
+                    .attr('probability', value)
+            }
                 //     // .style("pointer-events", "none")
             }
         )

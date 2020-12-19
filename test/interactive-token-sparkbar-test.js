@@ -175,8 +175,8 @@ test('InteractiveTokenSparkbar.init() sets up the visualization', function (test
     t.init()
 
     test.equals(t.innerDiv.selectAll('.sequence-indicator').size(),
-        2,
-        "'input' and 'output' sequence indicators were created.")
+        1,
+        "'output' sequence indicators was created.")
     test.equals(t.innerDiv.selectAll('.token').size(), 3,
         "Three token divs correctly created.") // 3 tokens in the initializer
 

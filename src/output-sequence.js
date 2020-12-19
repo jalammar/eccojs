@@ -34,7 +34,6 @@ export function renderSeqHighlightPosition(parent_div, position, data) {
     let s = d3.selectAll(`[position="${position}"]`)
         .style('border', '1px solid #8E24AA')
     highlighter.init();
-    console.log('Selection', selection, s)
 }
 
 // Small bar next to each token. Change their value upon hovering on output
